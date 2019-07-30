@@ -15,10 +15,5 @@ export default {
   components: {
     ToolBar,
   },
-  data() {
-    return {
-
-    };
-  },
 };
 </script>
