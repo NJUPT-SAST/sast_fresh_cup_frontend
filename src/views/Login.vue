@@ -3,6 +3,7 @@
     <v-snackbar
       v-model="loginError"
       color="error"
+      :right="true"
       :top="true"
       :timeout="3000"
     >登录失败，请检查学号或密码是否正确</v-snackbar>
