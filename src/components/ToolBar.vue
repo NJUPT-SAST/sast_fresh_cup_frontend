@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar color="primary" height="80">
+  <v-toolbar color="primary" height="80" app clipped-left>
     <v-toolbar-title class="toolBar-title">
       计算机基础知识竞赛
     </v-toolbar-title>
