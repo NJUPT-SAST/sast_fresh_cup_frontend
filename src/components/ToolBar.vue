@@ -5,7 +5,7 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-btn :flat="true">
-      <div class="toolBar-btn">比赛须知</div>
+      <div class="toolBar-btn" @click="jump('notice')">比赛须知</div>
     </v-btn>
     <v-btn :flat="true" @click="jump('login')">
       <div class="toolBar-btn">登录</div>
