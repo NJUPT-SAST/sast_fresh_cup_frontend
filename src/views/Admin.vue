@@ -28,24 +28,21 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-content style="padding: 0">
-      <v-container class="detail">
-        <v-layout column justify-start>
-          <v-flex>
-            <template v-if="status === 'announcement'"><Announcement /></template>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-content>
+    <div class="detail">
+      <Announcement v-if="status === 'announcement'"/>
+      <SetMatchTime v-else-if="status === 'setMatchTime'"/>
+    </div>
   </v-content>
 </template>
 
 <script>
 import Announcement from '../components/Announcement';
+import SetMatchTime from '../components/SetMatchTime';
 
 export default {
   components: {
     Announcement,
+    SetMatchTime,
   },
   data: () => ({
     status: '',
@@ -60,6 +57,7 @@ export default {
 
 <style lang="stylus">
 .detail
-  margin 0
-  width 60vw
+  margin-top 2rem
+  margin-left 3rem
+  width 50vw
 </style>

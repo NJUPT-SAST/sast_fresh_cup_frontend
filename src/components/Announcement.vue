@@ -1,5 +1,5 @@
 <template>
-  <div class="announcement" style="padding: 0">
+  <div class="announcement">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isReleaseSuccess? 'success' : 'error'"
@@ -8,8 +8,14 @@
       :timeout="3000"
     >{{isReleaseSuccess? "发布成功！" : "发布失败，服务异常！"}}</v-snackbar>
     <div class="headline">公告发布</div>
-    <v-text-field outline label="标题" prepend-inner-icon="title" clearable/>
-    <v-textarea prepend-inner-icon="text_fields" auto-grow outline label="内容" clearable/>
+    <v-text-field v-model="bulletinTitle" outline label="标题" prepend-inner-icon="title" clearable/>
+    <v-textarea
+      v-model="bulletinContent"
+      prepend-inner-icon="text_fields"
+      auto-grow
+      outline
+      label="内容"
+      clearable/>
     <div class="btn-groups">
       <v-btn
         color="success"
@@ -41,6 +47,8 @@ export default {
         this.isReleasing = false;
         this.isSnackBarShow = true;
         this.isReleaseSuccess = false; // true
+        this.bulletinTitle = '';
+        this.bulletinContent = '';
       }, 3000);
     },
   },
@@ -49,9 +57,8 @@ export default {
 
 <style lang="stylus">
 .announcement
-  margin-left 1.2rem
   .headline
-    margin-bottom 1rem
+    margin-bottom 2rem
   .btn-groups
     display flex
     justify-content flex-end
