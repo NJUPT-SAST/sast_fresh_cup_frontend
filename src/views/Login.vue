@@ -24,6 +24,7 @@
                   name="login"
                   prepend-icon="person"
                   type="text"
+                  autofocus
                 ></v-text-field>
                 <v-text-field
                   id="password"
