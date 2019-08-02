@@ -8,7 +8,9 @@
                 <br>点击确定报名参加本次比赛</v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-        <v-btn color="primary">确认</v-btn>
+        <router-link to="Login">
+               <v-btn color="primary">确认</v-btn>
+        </router-link>   
     </v-card-actions>
   </v-card>
 </template>、
@@ -16,7 +18,7 @@
 <script>
 export default {
   data(){
-
+     return{}
   }
 }
 </script>
