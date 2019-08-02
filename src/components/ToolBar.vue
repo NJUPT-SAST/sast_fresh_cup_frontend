@@ -7,8 +7,8 @@
       <v-spacer></v-spacer>
       <v-badge color="error" overlap>
         <template v-if="noticeCount" v-slot:badge>{{noticeCount}}</template>
-        <v-btn flat type>
-          <div class="toolBar-btn" @click="jump('notice')">公告</div>
+        <v-btn flat type @click="jump('notice')">
+          <div class="toolBar-btn" >公告</div>
         </v-btn>
       </v-badge>
       <v-btn flat @click="jump('login')">
