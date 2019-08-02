@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-content>
     Hello Answer
-  </div>
+  </v-content>
 </template>
