@@ -7,6 +7,19 @@
       :top="true"
       :timeout="3000"
     >{{isReleaseSuccess? "发布成功！" : "发布失败，服务异常！"}}</v-snackbar>
+    <v-btn
+      fab
+      dark
+      color="success"
+      absolute
+      bottom
+      right
+      @click="handleRelease"
+      :loading="isReleasing"
+      :disable="isReleasing"
+    >
+      <v-icon dark>check</v-icon>
+    </v-btn>
     <div class="headline">公告发布</div>
     <v-text-field v-model="bulletinTitle" outline label="标题" prepend-inner-icon="title" clearable/>
     <v-textarea
@@ -15,15 +28,8 @@
       auto-grow
       outline
       label="内容"
-      clearable/>
-    <div class="btn-groups">
-      <v-btn
-        color="success"
-        @click="handleRelease"
-        :loading="isReleasing"
-        :disable="isReleasing"
-      >发布</v-btn>
-    </div>
+      clearable
+    />
   </div>
 </template>
 

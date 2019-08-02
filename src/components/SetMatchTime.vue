@@ -7,6 +7,19 @@
       :top="true"
       :timeout="3000"
     >{{isSetSuccess? "设置成功！" : "设置失败，服务异常！"}}</v-snackbar>
+    <v-btn
+      fab
+      dark
+      color="success"
+      absolute
+      bottom
+      right
+      @click="handleSetting"
+      :loading="isSetting"
+      :disable="isSetting"
+    >
+      <v-icon dark>check</v-icon>
+    </v-btn>
     <div class="headline">比赛时间设置</div>
     <div class="time-picker-groups">
       <v-dialog
@@ -58,14 +71,6 @@
         </v-time-picker>
       </v-dialog>
     </div>
-    <div class="btn-groups">
-      <v-btn
-        color="success"
-        @click="handleSetting"
-        :loading="isSetting"
-        :disable="isSetting"
-      >设置</v-btn>
-    </div>
   </div>
 </template>
 
@@ -104,8 +109,10 @@ export default {
   .headline
     margin-bottom 2rem
   .time-picker-groups
+    width 50%
     margin-bottom 2rem
   .btn-groups
+    width 50%
     display flex
     justify-content flex-end
 </style>
