@@ -1,6 +1,6 @@
 <template>
   <v-toolbar color="primary" height="80">
-    <v-toolbar-title class="toolBar-title">
+    <v-toolbar-title class="toolBar-title" @click="jump('homepage')">
       计算机基础知识竞赛
     </v-toolbar-title>
     <v-spacer></v-spacer>
