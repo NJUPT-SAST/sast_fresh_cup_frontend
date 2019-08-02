@@ -1,5 +1,5 @@
 <template>
-  <v-footer>
+  <v-footer app>
     <v-flex text-center>
       <P class="footer-text">2019 — <strong>@SAST</strong></P>
     </v-flex>
