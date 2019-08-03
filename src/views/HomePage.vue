@@ -10,33 +10,28 @@
       <v-spacer></v-spacer>
         <router-link to="Login">
                <v-btn color="primary">确认</v-btn>
-        </router-link>   
+        </router-link>
     </v-card-actions>
   </v-card>
-</template>、
+</template>
 
 <script>
-export default {
-  data(){
-     return{}
-  }
-}
+
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .mx-auto{
   margin:150px auto;
   box-shadow:0 0 8px rgb(131, 132, 133);
-  .card_title{
+}
+.card_title{
     background-color: #1976d2;
     color:#fff;
     font-size:20px;
   }
-  .v-card__text{
+.v-card__text{
     padding:20px;
     line-height:35px;
     font-size:18px;
   }
-}
-
 </style>
