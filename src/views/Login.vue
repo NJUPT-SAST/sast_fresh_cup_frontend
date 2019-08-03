@@ -1,5 +1,5 @@
 <template>
-  <v-content class="login-container">
+  <div class="login-container">
     <v-snackbar
       v-model="loginError"
       color="error"
@@ -44,7 +44,7 @@
         </v-flex>
       </v-layout>
     </v-container>
-  </v-content>
+  </div>
 </template>
 
 <script>

@@ -19,6 +19,7 @@ module.exports = {
       args: 'none',
     }],
     indent: [2, 2],
+    'linebreak-style': 'off'
   },
   parserOptions: {
     parser: 'babel-eslint',

@@ -12,8 +12,8 @@
                <v-btn color="primary">确认</v-btn>
         </router-link>   
     </v-card-actions>
-  </v-card>
-</template>、
+  </v-card> 
+</template>
 
 <script>
 export default {
@@ -38,5 +38,4 @@ export default {
     font-size:18px;
   }
 }
-
 </style>
