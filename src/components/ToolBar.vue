@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-toolbar color="primary" height="80" app clipped-left>
+  <div style="z-index:9">
+    <v-toolbar color="primary" height="80">
       <v-toolbar-title class="toolBar-title" @click="jump('homepage')">
         计算机基础知识竞赛
       </v-toolbar-title>
@@ -78,6 +78,8 @@ export default {
   color white
   margin-left 20px !important
   cursor: pointer
+  user-select none
 .toolBar-btn
   color white
+  user-select none
 </style>
