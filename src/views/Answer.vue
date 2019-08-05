@@ -11,33 +11,73 @@
       />
     </div>
     <div class="answer-content">
-      <v-card class="anwer-content-card">
-        <v-card-title class="answer-content-card-title">
-          {{questionList[selectedIndex].title}}
-        </v-card-title>
-        <v-card-text class="answer-content-card-text">
-          {{questionList[selectedIndex].content}}
-        </v-card-text>
-        <v-textarea
-          outlined
-          label="请填写答案"
-          rows="10"
-          no-resize
-          v-model="answer"
-        ></v-textarea>
-        <v-card-actions class="answer-content-card-action">
-          <v-btn color="grey" style="margin-right:20px;color:white" @click="answer= ''">重置</v-btn>
-          <v-btn color="success" style="margin-right:20px">提交</v-btn>
-        </v-card-actions>
-      </v-card>
+      <fab-group />
+            <div ref="content">
+              <v-card class="anwer-content-card">
+                <v-card-title class="answer-content-card-title">
+                  {{questionList[selectedIndex].title}}
+                </v-card-title>
+                <v-card-text class="answer-content-card-text">
+                  {{questionList[selectedIndex].content}}
+                  <div
+                    class="answer-content-card-img-container"
+                    v-if="questionList[selectedIndex].image"
+                  >
+                    <img
+                      class="answer-content-card-img elevation-1"
+                      v-for="(item,index) in questionList[selectedIndex].image"
+                      :src="item"
+                      :key="index"
+                      alt=""
+                      @click="newTab(item)"
+                    >
+                  </div>
+                  <div
+                    class="answer-content-card-attachment"
+                    v-if="questionList[selectedIndex].attachment"
+                  >
+                    <v-btn
+                      v-for="(item,index) in questionList[selectedIndex].attachment"
+                      :key="index"
+                      @click="newTab(item.uri)"
+                      color="#90CAF9"
+                      style="color:white"
+                    >
+                      {{item.text}}
+                    </v-btn>
+                  </div>
+                </v-card-text>
+                <v-textarea
+                  outlined
+                  label="请填写答案"
+                  rows="10"
+                  no-resize
+                  v-model="answer"
+                ></v-textarea>
+                <v-card-actions class="answer-content-card-action">
+                  <v-btn
+                    color="grey"
+                    style="margin-right:40px;color:white"
+                    @click="answer= ''"
+                  >重置</v-btn>
+                  <v-btn color="success" style="margin-right:120px">提交</v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
       <div class="answer-content-btn-container">
         <v-btn
           :disabled="selectedIndex === 0"
           @click="selectedIndex--"
+          style="width: 300px"
+          large
+          color="#CFD8DC"
         >上一题</v-btn>
         <v-btn
           :disabled="selectedIndex === questionList.length-1"
           @click="selectedIndex++"
+          style="width:300px"
+          large
+          color="#CFD8DC"
         >下一题</v-btn>
       </div>
     </div>
@@ -50,17 +90,19 @@
   .answer-sidebar-container
     padding-top 10px
     height calc(100vh - 80px)
-    width 400px
+    width 300px
     overflow-x hidden
     overflow-y auto
     z-index 2
+  .answer-content::-webkit-scrollbar
+    width: 0 !important
   .answer-content
     overflow-x hidden
     overflow-y auto
     height calc(100vh - 80px)
     width 100%
     padding 1rem
-    padding-bottom 20px
+    padding-bottom 40px
     background-color #f5f5f5
     z-index 1
     .anwer-content-card
@@ -69,13 +111,22 @@
         font-size 36px
       .answer-content-card-text
         min-height 40vh
-        font-size 20px
+        font-size 18px
+      .answer-content-card-img-container
+        margin 0 auto
+        display flex
+        flex-wrap wrap
+        .answer-content-card-img
+          cursor pointer
+          width 40%
+          margin 0 auto
       .answer-content-card-action
         display flex
         justify-content flex-end
     .answer-content-btn-container
       display flex
-      width 100%
+      margin 0 auto
+      width 70%
       padding-left 20px
       padding-right 20px
       justify-content space-between
@@ -83,11 +134,28 @@
 
 <script>
 import SideBarItem from '../components/SideBarItem';
+import FabGroup from '../components/FabGroup';
 
 export default {
   name: 'Answer',
   components: {
     SideBarItem,
+    FabGroup,
+  },
+  methods: {
+    newTab(target) {
+      window.open(target, '_blank');
+    },
+  },
+  watch: {
+    selectedIndex() {
+      if (this.$refs.content) {
+        this.$refs.content.classList.remove('animated', 'fadeIn');
+        setInterval(() => {
+          this.$refs.content.classList.add('animated', 'fadeIn');
+        });
+      }
+    },
   },
   data() {
     return {
@@ -96,18 +164,25 @@ export default {
       questionList: [
         {
           title: 'question1',
-          content: '1这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
+          content: '1这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
           answered: true,
         },
         {
           title: 'question2',
-          content: '2这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
+          content: '2这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
           answered: true,
+          image: ['https://open.saintic.com/api/bingPic/', 'https://open.saintic.com/api/bingPic/'],
         },
         {
           title: 'question3',
           content: '3这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
           answered: true,
+          attachment: [
+            {
+              text: '这是个附件',
+              uri: 'https://open.saintic.com/api/bingPic/',
+            },
+          ],
         },
         {
           title: 'question4',

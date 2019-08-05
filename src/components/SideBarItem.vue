@@ -46,7 +46,7 @@ export default {
     handleMouseOut() {
       setTimeout(() => {
         this.isOver = false;
-      }, 180);
+      }, 80);
     },
   },
   computed: {
