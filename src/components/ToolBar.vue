@@ -37,6 +37,8 @@
   </div>
 </template>
 <script>
+import { hash } from '../api/index';
+
 export default {
   name: 'ToolBar',
   data() {
@@ -46,7 +48,7 @@ export default {
   },
   computed: {
     noticeCount() {
-      return this.$store.state.noticeCount;
+      return this.$store.getters.unreadNoticeCount;
     },
   },
   methods: {
@@ -58,15 +60,23 @@ export default {
       this.jump('notice');
     },
   },
-  mounted() {
-    this.$store.commit('handleNoticeCount', 1); // 到时候替换成对公告接口的轮询，将值与noticeCount对比，有变动再调用commit
-    this.showSnackbar = true;
+  async mounted() {
+    const hashResponse = await hash();
+    this.$store.dispatch('update', hashResponse.data);
+    setInterval(async () => {
+      const { hash: oldHash } = this.$store.state;
+      const { data: newHash } = await hash();
+      if (oldHash !== newHash) {
+        await this.$store.dispatch('update', newHash);
+        this.showSnackbar = true;
+      }
+    }, 60000); // 目前是一分钟轮询一次
   },
   watch: {
     // 对于清除公告角标应放置在ToolBar还是Notice，这个后面再看一下
     $route(val) {
       if (val.name === 'notice') {
-        this.$store.commit('handleNoticeCount', 0);
+        this.$store.commit('handleReadNotice');
       }
     },
   },

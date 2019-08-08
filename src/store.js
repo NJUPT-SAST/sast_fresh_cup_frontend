@@ -1,19 +1,42 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { getNotice, getQuestions, getDue } from './api/index';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    noticeCount: 0, // 这边的逻辑可能还要改，因为要显示未读的公告,
-    isCover: false,
+    noticeArray: [],
+    questionArray: [],
+    due: Date.now(),
+    readNoticeArray: [],
+    hash: undefined,
+  },
+  getters: {
+    unreadNoticeCount(state) {
+      const { noticeArray, readNoticeArray } = state;
+      return noticeArray.length - readNoticeArray.length;
+    },
   },
   mutations: {
-    handleNoticeCount(state, count) {
-      state.noticeCount = count;
+    handleReadNotice(state) {
+      state.readNoticeArray = state.noticeArray;
     },
-    handleIsCover(state, value = false) {
-      state.isCover = value;
+    handleUpdate(state, newState) {
+      Object.keys(newState).forEach((key) => {
+        state[key] = newState[key];
+      });
+    },
+  },
+  actions: {
+    async update({ commit }, hash) {
+      const { data: noticeArray } = await getNotice();
+      const { data: due } = await getDue();
+      const { data: questionArray } = await getQuestions();
+      commit('handleUpdate', {
+        noticeArray, due, questionArray, hash,
+      });
     },
   },
 });
