@@ -1,7 +1,10 @@
 <template>
   <v-footer v-if="visible">
     <v-flex text-center>
-      <P class="footer-text">2019 — <strong>@SAST</strong></P>
+      <P class="footer-text">
+        2019 —
+        <strong>@SAST</strong>
+      </P>
     </v-flex>
   </v-footer>
 </template>
@@ -10,7 +13,15 @@ export default {
   name: 'Footer',
   computed: {
     visible() {
-      return this.$route.name !== 'answer';
+      const routeName = this.$route.name;
+      switch (routeName) {
+      case 'answer':
+        return false;
+      case 'admin':
+        return false;
+      default:
+        return true;
+      }
     },
   },
 };
