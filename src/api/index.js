@@ -16,7 +16,7 @@ const postData = (obj) => {
   return data;
 };
 
-export const hash = () => instance.get('/hash');
+export const getHash = () => instance.get('/hash');
 
 export const login = (username, password) => instance.post('/login', postData({ username, password }));
 
@@ -25,6 +25,8 @@ export const getNotice = () => instance.get('/notice');
 export const getDue = () => instance.get('/due');
 
 export const getQuestions = () => instance.get('/questions');
+
+export const getSubmitted = () => instance.get('/submited');
 
 export const submit = (id, content) => instance.post('/submit', postData({ id, content }));
 

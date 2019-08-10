@@ -5,12 +5,15 @@ export default function ThrottleConstructor(fn, interval = 0) {
     if (timer) clearTimeout(timer);
     wraper = () => {
       fn(...args);
+      timer = undefined;
     };
     timer = setTimeout(wraper, interval);
   }
   function Clear() {
-    clearTimeout(timer);
-    wraper();
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      wraper();
+    }
   }
   return {
     Throttle, Clear,

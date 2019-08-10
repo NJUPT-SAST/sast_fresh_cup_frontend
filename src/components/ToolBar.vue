@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import { hash } from '../api/index';
+import { getHash } from '../api/index';
 
 export default {
   name: 'ToolBar',
@@ -61,11 +61,10 @@ export default {
     },
   },
   async mounted() {
-    const hashResponse = await hash();
-    this.$store.dispatch('update', hashResponse.data);
+    this.$store.dispatch('init');
     setInterval(async () => {
       const { hash: oldHash } = this.$store.state;
-      const { data: newHash } = await hash();
+      const { data: newHash } = await getHash();
       if (oldHash !== newHash) {
         await this.$store.dispatch('update', newHash);
         this.showSnackbar = true;

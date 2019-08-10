@@ -68,7 +68,6 @@ export default {
 .side-bar-item
   margin 0 auto
   margin-left 10px
-  // width 95%
   margin-top 8px
   margin-bottom 8px
   cursor pointer
