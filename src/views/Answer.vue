@@ -87,7 +87,7 @@
 <script>
 import SideBarItem from '../components/SideBarItem';
 import FabGroup from '../components/FabGroup';
-import ThrottleConstructor from '../utils/throttle.js';
+import DebounceConstructor from '../utils/debounce.js';
 import { submit } from '../api/index.js';
 
 export default {
@@ -130,8 +130,8 @@ export default {
   },
   data() {
     const {
-      Throttle: handleTyping, Clear: handleExecute,
-    } = ThrottleConstructor((val) => {
+      Debounce: handleTyping, Clear: handleExecute,
+    } = DebounceConstructor((val) => {
       submit(this.questionList[this.selectedIndex].id, val);
       console.log(val);
     }, 800);

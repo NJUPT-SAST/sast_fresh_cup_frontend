@@ -1,7 +1,7 @@
-export default function ThrottleConstructor(fn, interval = 0) {
+export default function DebounceConstructor(fn, interval = 0) {
   let timer;
   let wraper;
-  function Throttle(...args) {
+  function Debounce(...args) {
     if (timer) clearTimeout(timer);
     wraper = () => {
       fn(...args);
@@ -16,6 +16,6 @@ export default function ThrottleConstructor(fn, interval = 0) {
     }
   }
   return {
-    Throttle, Clear,
+    Debounce, Clear,
   };
 }
