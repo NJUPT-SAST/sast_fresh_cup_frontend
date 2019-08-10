@@ -20,7 +20,7 @@
     >
       <v-icon dark>check</v-icon>
     </v-btn>
-    <div class="headline">公告发布</div>
+    <div class="headline">公告编辑</div>
     <v-text-field
       v-model="bulletinTitle"
       outline
@@ -36,6 +36,7 @@
       outline
       label="内容"
       clearable
+      style="width: 80%"
       height="40vh"
     />
   </v-card>

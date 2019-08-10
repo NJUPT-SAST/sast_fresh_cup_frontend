@@ -22,10 +22,15 @@
       <v-icon dark>check</v-icon>
     </v-btn>
     <div class="headline">题目编辑
-      <v-btn
-        color="blue-grey"
-        class="white--text upload-btn"
-      >上传
+      <v-btn color="blue-grey" class="white--text upload-btn" @click="$refs.upload.click()">
+        上传
+        <input
+          type="file"
+          style="width: 0; height: 0; visiable: hidden"
+          ref="upload"
+          @change="handleUpload"
+          accept=".xlsx"
+        >
         <v-icon right dark>cloud_upload</v-icon>
       </v-btn>
     </div>
@@ -85,6 +90,8 @@
 </template>
 
 <script>
+import XLSX from 'xlsx';
+
 export default {
   data: () => ({
     isSnackBarShow: false,
@@ -100,6 +107,12 @@ export default {
       { label: '选项三', content: '', deleteBtn: false },
       { label: '选项四', content: '', deleteBtn: false },
     ],
+    submitTopic: {
+      department: '',
+      title: '',
+      content: '',
+      options: [],
+    },
     isChoiceMax: false,
   }),
   methods: {
@@ -138,6 +151,48 @@ export default {
         ];
       }, 3000);
     },
+    handleUpload(e) {
+      const { files } = e.target;
+      if (files) {
+        Object.keys(files).forEach((key) => {
+          const fileReader = new FileReader();
+          fileReader.onload = (ev) => {
+            try {
+              const data = ev.target.result;
+              const workbook = XLSX.read(data, { type: 'binary' });
+              const workSheetName = workbook.SheetNames[0];
+              const sheetOutput = XLSX.utils.sheet_to_json(workbook.Sheets[workSheetName]);
+              sheetOutput.forEach((item) => {
+                this.submitTopic = {};
+                this.submitTopic.options = [];
+                Object.keys(item).forEach((itemKey) => {
+                  switch (itemKey) {
+                  case '部门':
+                    this.submitTopic.department = item[itemKey];
+                    break;
+                  case '题目标题':
+                    this.submitTopic.title = item[itemKey];
+                    break;
+                  case '题目内容':
+                    this.submitTopic.content = item[itemKey];
+                    break;
+                  default: // 默认为选项
+                    this.submitTopic.options.push(item[itemKey]);
+                  }
+                });
+                /**
+                 * 在这里上传，目前是一道一道上传，等后端完成后再对接
+                 */
+                console.log(this.submitTopic);
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          };
+          fileReader.readAsBinaryString(files[key]);
+        });
+      }
+    },
   },
 };
 </script>
@@ -151,6 +206,7 @@ export default {
     margin-bottom 0.5rem
     .upload-btn
       margin-left 2rem
+      width 100px
   .edit-part
     display flex
     flex-direction row

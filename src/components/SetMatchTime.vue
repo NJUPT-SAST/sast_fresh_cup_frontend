@@ -21,11 +21,56 @@
       <v-icon dark>check</v-icon>
     </v-btn>
     <div class="headline">比赛时间设置</div>
-    <div class="ready-time">预设结束时间：{{endTime}}</div>
     <div class="time-picker-groups">
-      <v-time-picker v-model="endTime" full-width landscape format="24hr"></v-time-picker>
+      <v-dialog
+        ref="dialog1"
+        v-model="startModal"
+        :return-value.sync="startTime"
+        persistent
+        lazy
+        full-width
+        width="290px"
+      >
+        <template v-slot:activator="{ on }">
+          <v-text-field
+            v-model="startTime"
+            label="比赛开始时间"
+            prepend-icon="access_time"
+            readonly
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-time-picker v-if="startModal" v-model="startTime" format="24hr" full-width>
+          <v-spacer></v-spacer>
+          <v-btn flat color="primary" @click="startModal = false">取消</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog1.save(startTime)">确认</v-btn>
+        </v-time-picker>
+      </v-dialog>
+      <v-dialog
+        ref="dialog2"
+        v-model="endModal"
+        :return-value.sync="endTime"
+        persistent
+        lazy
+        full-width
+        width="290px"
+      >
+        <template v-slot:activator="{ on }">
+          <v-text-field
+            v-model="endTime"
+            label="比赛结束时间"
+            prepend-icon="access_time"
+            readonly
+            v-on="on"
+          ></v-text-field>
+        </template>
+        <v-time-picker v-if="endModal" v-model="endTime" format="24hr" full-width>
+          <v-spacer></v-spacer>
+          <v-btn flat color="primary" @click="endModal = false">取消</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog2.save(endTime)">确认</v-btn>
+        </v-time-picker>
+      </v-dialog>
     </div>
-    <div class="helper font-weight-thin font-italic">（↑ 点击上方的数字分别设置时、分 ↑）</div>
     <div class="btn-groups">
       <v-btn color="grey lighten-1" @click="handleReset">重置
         <v-icon right dark>reply</v-icon>
@@ -61,6 +106,7 @@ export default {
       }, 3000);
     },
     handleReset() {
+      this.startTime = null;
       this.endTime = null;
     },
   },
@@ -73,13 +119,8 @@ export default {
   height auto
   .headline
     margin-bottom 2rem
-  .ready-time
-    text-align center
-    font-size 1.2rem
-    color #039BE5
-    margin-bottom 1.5rem
   .time-picker-groups
-    width 100%
+    width 50%
     margin-bottom 2rem
   .btn-groups
     display flex
