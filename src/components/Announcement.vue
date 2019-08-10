@@ -1,5 +1,5 @@
 <template>
-  <div class="announcement">
+  <v-card class="announcement">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isReleaseSuccess? 'success' : 'error'"
@@ -11,7 +11,7 @@
       fab
       dark
       color="success"
-      absolute
+      fixed
       bottom
       right
       @click="handleRelease"
@@ -20,8 +20,15 @@
     >
       <v-icon dark>check</v-icon>
     </v-btn>
-    <div class="headline">公告发布</div>
-    <v-text-field v-model="bulletinTitle" outline label="标题" prepend-inner-icon="title" clearable/>
+    <div class="headline">公告编辑</div>
+    <v-text-field
+      v-model="bulletinTitle"
+      outline
+      label="标题"
+      prepend-inner-icon="title"
+      clearable
+      style="width: 50%"
+    />
     <v-textarea
       v-model="bulletinContent"
       prepend-inner-icon="text_fields"
@@ -29,8 +36,10 @@
       outline
       label="内容"
       clearable
+      style="width: 80%"
+      height="40vh"
     />
-  </div>
+  </v-card>
 </template>
 
 <script>
@@ -63,6 +72,9 @@ export default {
 
 <style lang="stylus">
 .announcement
+  padding 3rem
+  width 100%
+  height 90%
   .headline
     margin-bottom 2rem
   .btn-groups
