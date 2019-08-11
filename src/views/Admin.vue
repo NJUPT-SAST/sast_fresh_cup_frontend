@@ -1,6 +1,6 @@
 <template>
   <div class="admin">
-    <v-navigation-drawer clipped permanent style="width: 250px; height: calc(100vh - 80px)">
+    <v-navigation-drawer clipped permanent style="width: 15vw; height: calc(100vh - 80px)">
       <v-list dense>
         <v-list-tile @click="changeStatus('announcement')">
           <v-list-tile-action>
@@ -68,6 +68,6 @@ export default {
   .detail
     margin-top 2rem
     margin-left 2rem
-    width calc(90vw - 250px)
+    width 75vw
     height 82vh
 </style>
