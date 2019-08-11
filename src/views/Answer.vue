@@ -47,6 +47,8 @@
               </v-btn>
             </div>
           </v-card-text>
+        </v-card>
+        <v-card class="anwer-content-card">
           <v-textarea
             outlined
             label="请填写答案"
@@ -76,6 +78,7 @@
               @click="questionList[selectedIndex].answer= ''"
             >重置</v-btn>
           </v-card-actions>
+
         </v-card>
       </div>
       <div class="answer-content-btn-container">
@@ -194,11 +197,11 @@ export default {
     background-color #f5f5f5
     z-index 1
     .anwer-content-card
+      margin-top 1rem
       padding 1rem
       .answer-content-card-title
         font-size 36px
       .answer-content-card-text
-        min-height 40vh
         font-size 18px
       .answer-content-card-img-container
         margin 0 auto
