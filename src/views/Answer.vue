@@ -115,9 +115,9 @@ export default {
   },
   watch: {
     selectedIndex() {
-      if (this.$refs.content) {
+      if (this.$refs.content.classList) {
         this.$refs.content.classList.remove('animated', 'fadeIn');
-        setInterval(() => {
+        setTimeout(() => {
           this.$refs.content.classList.add('animated', 'fadeIn');
         });
       }

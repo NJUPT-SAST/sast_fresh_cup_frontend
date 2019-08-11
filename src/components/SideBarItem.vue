@@ -2,7 +2,7 @@
   <v-sheet
     class="side-bar-item"
     :elevation="isFocus ? 7 : 0 "
-    :height="isOver ? 90 : 60"
+    :height="isOver ? 80 : 70"
     :color="answered ? '#8BC34A' : '#ECEFF1'"
     :style="itemStyle"
     @click="$emit('click')"
@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     itemStyle() {
-      const margin = this.isFocus ? '16px' : '8px';
+      const margin = this.isFocus ? '22px' : '8px';
       const width = this.selected ? '95%' : (this.isFocus ? '93%' : '90%');
       return { marginTop: margin, marginBottom: margin, width };
     },
