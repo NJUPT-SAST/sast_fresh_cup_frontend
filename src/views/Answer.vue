@@ -53,13 +53,27 @@
             rows="10"
             no-resize
             :value="questionList[selectedIndex].answer"
-            @input="handleTextChange"
+            @input="handleValueChange"
+            v-if="!questionList[selectedIndex].options.length"
           ></v-textarea>
+          <v-radio-group
+            v-else
+            :mandatory="false"
+            @change="handleValueChange"
+            :value="questionList[selectedIndex].answer"
+          >
+            <v-radio
+              v-for="(option,index) in questionList[selectedIndex].options"
+              :key="index"
+              :label="option"
+              :value="option"
+            ></v-radio>
+          </v-radio-group>
           <v-card-actions class="answer-content-card-action">
             <v-btn
               color="grey"
               style="margin-right:40px;color:white"
-              @click="answer= ''"
+              @click="questionList[selectedIndex].answer= ''"
             >重置</v-btn>
           </v-card-actions>
         </v-card>
@@ -100,7 +114,7 @@ export default {
     newTab(target) {
       window.open(target, '_blank');
     },
-    handleTextChange(e) {
+    handleValueChange(e) {
       this.$store.commit('handleAnswerChange', e, this.selectedIndex);
       this.handleTyping(e);
     },
@@ -145,6 +159,20 @@ export default {
 </script>
 
 <style lang="stylus">
+::-webkit-scrollbar
+  width: 10px;
+/* 滚动槽 */
+::-webkit-scrollbar-track
+  background-color #ECEFF1
+  border-radius: 4px;
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb
+  border-radius: 4px;
+  background: #bbb;
+// ::-webkit-scrollbar-thumb:window-inactive
+//   background: rgba(255,0,0,0.4);
+
+
 .answer-container
   display flex
   .answer-sidebar-container

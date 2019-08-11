@@ -3,7 +3,7 @@
     class="side-bar-item"
     :elevation="isFocus ? 7 : 0 "
     :height="isOver ? 80 : 70"
-    :color="answered ? '#8BC34A' : '#ECEFF1'"
+    :color="answered ? '#039BE5' : '#E0F2F1'"
     :style="itemStyle"
     @click="$emit('click')"
     @mouseenter="handleMouseMove"
