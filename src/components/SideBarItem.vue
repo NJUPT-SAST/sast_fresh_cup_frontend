@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     itemStyle() {
-      const margin = this.isFocus ? '22px' : '8px';
+      const margin = this.selected ? '14px' : (this.isFocus ? '22px' : '8px');
       const width = this.selected ? '95%' : (this.isFocus ? '93%' : '90%');
       return { marginTop: margin, marginBottom: margin, width };
     },
