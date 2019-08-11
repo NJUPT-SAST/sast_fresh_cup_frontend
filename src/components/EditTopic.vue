@@ -35,42 +35,35 @@
     </div>
     <div class="edit-part">
       <div class="left-part">
-        <v-select
-          v-model="departmentChoice"
-          class="department-choice"
-          :items="departmentOptions"
-          label="部门"
-          prepend-inner-icon="people"
-        />
         <v-text-field
           class="topic-title"
-          v-model="topicTitle"
+          v-model="submitTopic.title"
           label="题目标题"
           prepend-inner-icon="title"
         />
         <v-textarea
-          v-model="topicContent"
+          v-model="submitTopic.content"
           box
           label="题目内容"
           prepend-inner-icon="notes"
-          height="calc(39vh)"
+          height="49vh"
         />
       </div>
       <v-card class="right-part">
         <v-tabs
           v-model="activeTab"
           color="primary"
-          slider-color="yellow"
+          slider-color=yellow
           dark
           style="width: 100%"
           grow
         >
-          <v-btn icon dark color="primary" @click="addOptions">
-            <v-icon dark>playlist_add</v-icon>
-          </v-btn>
           <v-tab v-for="(tab, index) in tabsOptions" :key="index">{{tab}}</v-tab>
           <v-tab-item>
             <div class="choice-part">
+              <v-btn flat icon color="primary" @click="addOption" style="margin-bottom: 1rem">
+                <v-icon>playlist_add</v-icon>
+              </v-btn>
               <div class="topic-choice-groups">
                 <template v-for="(item, index) in topicChoice">
                   <div class="topic-choice" :key="index">
@@ -82,7 +75,7 @@
                             dark
                             color="error"
                             v-if="item.deleteBtn"
-                            @click="removeOptions"
+                            @click="removeOption"
                             :id="index"
                             style="width: 30px; height: 30px;"
                           >
@@ -98,48 +91,77 @@
           </v-tab-item>
           <v-tab-item>
             <div class="img-part">
-              <template v-for="(item, index) in imageGroups">
-                <div class="topic-img" :key="index">
-                  <v-text-field v-model="item.address" label="图片地址" clearable>
-                    <template v-slot:append>
+              <input
+                type="file"
+                ref="image"
+                accept=".jpg, .jpeg, .png"
+                name="image"
+                @change="handleFile"
+                style="width: 0; height: 0; visiable: hidden"
+              >
+              <v-btn @click="$refs.image.click()">添加文件</v-btn>
+              <v-card class="img-groups">
+                <v-list subheader>
+                  <v-subheader>
+                    <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
+                  </v-subheader>
+                  <v-divider light></v-divider>
+                  <v-list-tile v-for="(item, index) in imageGroups" :key="index" @click.stop>
+                    <v-list-tile-content>
+                      <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
                       <v-btn
                         fab
-                        dark
+                        ripple
                         color="error"
-                        v-if="item.deleteBtn"
-                        @click="removeOptions"
-                        :id="index"
                         style="width: 30px; height: 30px;"
+                        @click="removeOption"
+                        :id="index"
                       >
                         <v-icon dark :id="index">remove</v-icon>
                       </v-btn>
-                    </template>
-                  </v-text-field>
-                </div>
-              </template>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                </v-list>
+              </v-card>
             </div>
           </v-tab-item>
           <v-tab-item>
             <div class="annex-part">
-              <template v-for="(item, index) in annexGroups">
-                <div class="topic-annex" :key="index">
-                  <v-text-field v-model="item.address" label="附件地址" clearable>
-                    <template v-slot:append>
+              <input
+                type="file"
+                ref="annex"
+                name="annex"
+                @change="handleFile"
+                style="width: 0; height: 0; visiable: hidden"
+              >
+              <v-btn @click="$refs.annex.click()">添加文件</v-btn>
+              <v-card class="annex-groups">
+                <v-list subheader>
+                  <v-subheader>
+                    <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
+                  </v-subheader>
+                  <v-divider light></v-divider>
+                  <v-list-tile v-for="(item, index) in annexGroups" :key="index" @click.stop>
+                    <v-list-tile-content>
+                      <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
                       <v-btn
                         fab
-                        dark
+                        ripple
                         color="error"
-                        v-if="item.deleteBtn"
-                        @click="removeOptions"
-                        :id="index"
                         style="width: 30px; height: 30px;"
+                        @click="removeOption"
+                        :id="index"
                       >
                         <v-icon dark :id="index">remove</v-icon>
                       </v-btn>
-                    </template>
-                  </v-text-field>
-                </div>
-              </template>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                </v-list>
+              </v-card>
             </div>
           </v-tab-item>
         </v-tabs>
@@ -156,70 +178,37 @@ export default {
     isSnackBarShow: false,
     isSubmitSuccess: false,
     isSubmiting: false,
-    departmentOptions: ['软件研发中心', '电子部', '办公部门'],
+    errorMsg: '',
     tabsOptions: ['选项', '图片', '附件'],
     activeTab: null,
-    departmentChoice: '',
-    topicTitle: '',
-    topicContent: '',
     topicChoice: [
       { label: '选项一', content: '', deleteBtn: false },
       { label: '选项二', content: '', deleteBtn: false },
       { label: '选项三', content: '', deleteBtn: false },
       { label: '选项四', content: '', deleteBtn: false },
-      { label: '额外选项', content: '', deleteBtn: true },
     ],
+    imageGroups: [],
+    annexGroups: [],
     // 提交单道题目时使用
     submitTopic: {
-      department: '',
       title: '',
       content: '',
       options: [],
       images: [],
       annexs: [],
     },
-    // 上传Excel时将 submitTopic push 进这个数组一起提交
+    // 上传Excel时将 submitTopic push 进这个数组，用 Array<object> 提交
     topicGroups: [],
-    imageGroups: [
-      { address: '', deleteBtn: false },
-      { address: '', deleteBtn: false },
-      { address: '', deleteBtn: true },
-    ],
-    annexGroups: [
-      { address: '', deleteBtn: false },
-      { address: '', deleteBtn: false },
-      { address: '', deleteBtn: true },
-    ],
-    errorMsg: '',
   }),
   methods: {
-    addOptions() {
-      console.log(this.activeTab);
-      switch (this.activeTab) {
-      case 0:
-        this.topicChoice.push({
-          label: '额外选项',
-          content: '',
-          deleteBtn: true,
-        });
-        break;
-      case 1:
-        this.imageGroups.push({
-          address: '',
-          deleteBtn: true,
-        });
-        break;
-      case 2:
-        this.annexGroups.push({
-          address: '',
-          deleteBtn: true,
-        });
-        break;
-      default:
-        break;
-      }
+    addOption() {
+      this.topicChoice.push({
+        label: '额外选项',
+        content: '',
+        deleteBtn: true,
+      });
     },
-    removeOptions(e) {
+    removeOption(e) {
       const { id } = e.target;
       switch (this.activeTab) {
       case 0:
@@ -235,106 +224,107 @@ export default {
         break;
       }
     },
-    init() {
+    clearData() {
+      this.errorMsg = '';
       this.activeTab = 0;
-      this.departmentChoice = '';
-      this.topicTitle = '';
-      this.topicContent = '';
       this.topicChoice = [
         { label: '选项一', content: '', deleteBtn: false },
         { label: '选项二', content: '', deleteBtn: false },
         { label: '选项三', content: '', deleteBtn: false },
         { label: '选项四', content: '', deleteBtn: false },
-        { label: '额外选项', content: '', deleteBtn: true },
       ];
       this.submitTopic = {
-        department: '',
         title: '',
         content: '',
         options: [],
+        image: [],
+        annex: [],
       };
       this.topicGroups = [];
-      this.imageGroups = [
-        { address: '', deleteBtn: false },
-        { address: '', deleteBtn: false },
-        { address: '', deleteBtn: true },
-      ];
-      this.annexGroups = [
-        { address: '', deleteBtn: false },
-        { address: '', deleteBtn: false },
-        { address: '', deleteBtn: true },
-      ];
-      this.errorMsg = '';
+    },
+    handleFile(e) {
+      const { name, files } = e.target;
+      if (files.length !== 0) {
+        if (name === 'image') {
+          this.imageGroups.push({
+            fileName: files[0].name,
+            file: files[0],
+          });
+        } else if (name === 'annex') {
+          this.annexGroups.push({
+            fileName: files[0].name,
+            file: files[0],
+          });
+        }
+      }
     },
     handleSubmit() {
       this.isSubmiting = true;
-      this.submitTopic.department = this.departmentChoice;
-      this.submitTopic.title = this.topicTitle;
-      this.submitTopic.content = this.topicContent;
       this.topicChoice.forEach((item) => {
-        this.submitTopic.options.push(item.content);
+        if (item.content !== '') {
+          this.submitTopic.options.push(item.content);
+        }
       });
       this.imageGroups.forEach((item) => {
-        this.submitTopic.images.push(item);
+        if (item.file !== null) {
+          this.submitTopic.images.push(item.file);
+        }
       });
       this.annexGroups.forEach((item) => {
-        this.submitTopic.annexs.push(item);
+        if (item.file !== null) {
+          this.submitTopic.annexs.push(item.file);
+        }
       });
+      console.log(this.submitTopic);
       setTimeout(() => {
         this.isSubmiting = false;
         this.isSnackBarShow = true;
         this.isSubmitSuccess = false; // true
-        this.init();
+        this.clearData();
       }, 3000);
     },
     handleUpload(e) {
       const { files } = e.target;
-      if (files) {
-        /**
-         * 选取多个文件时分几次上传
-         */
-        Object.keys(files).forEach((key) => {
-          const fileReader = new FileReader();
-          fileReader.onload = (ev) => {
-            try {
-              const data = ev.target.result;
-              const workbook = XLSX.read(data, { type: 'binary' });
-              const workSheetName = workbook.SheetNames[0];
-              const sheetOutput = XLSX.utils.sheet_to_json(workbook.Sheets[workSheetName]);
-              sheetOutput.forEach((item) => {
-                this.submitTopic = {};
-                this.submitTopic.options = [];
-                this.submitTopic.images = [];
-                this.submitTopic.annexs = [];
-                Object.keys(item).forEach((itemKey) => {
-                  if (itemKey.indexOf('部门') !== -1) {
-                    this.submitTopic.department = item[itemKey];
-                  } else if (itemKey.indexOf('标题') !== -1) {
-                    this.submitTopic.title = item[itemKey];
-                  } else if (itemKey.indexOf('内容') !== -1) {
-                    this.submitTopic.content = item[itemKey];
-                  } else if (itemKey.indexOf('选项') !== -1) {
+      if (files.length !== 0) {
+        const fileReader = new FileReader();
+        fileReader.onload = (ev) => {
+          try {
+            const data = ev.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const workSheetName = workbook.SheetNames[0];
+            const sheetOutput = XLSX.utils.sheet_to_json(workbook.Sheets[workSheetName]);
+            sheetOutput.forEach((item) => {
+              // push 进一题后清空(批量添加时不需要 image 和 annex)
+              this.submitTopic = {
+                title: '',
+                content: '',
+                options: [],
+              };
+              Object.keys(item).forEach((itemKey) => {
+                if (itemKey.indexOf('标题') !== -1) {
+                  this.submitTopic.title = item[itemKey];
+                } else if (itemKey.indexOf('内容') !== -1) {
+                  this.submitTopic.content = item[itemKey];
+                } else if (itemKey.indexOf('选项') !== -1) {
+                  if (item[itemKey] !== '') {
                     this.submitTopic.options.push(item[itemKey]);
-                  } else if (itemKey.indexOf('图片') !== -1) {
-                    this.submitTopic.images.push(item[itemKey]);
-                  } else if (itemKey.indexOf('附件') !== -1) {
-                    this.submitTopic.annexs.push(item[itemKey]);
                   }
-                });
-                this.topicGroups.push(this.submitTopic);
+                }
               });
-              console.log(this.topicGroups);
-              /**
-               * 在这里上传, Array<object> 形式
-               */
-              this.topicGroups = [];
-            } catch (error) {
-              this.errorMsg = error;
-              console.log(error);
-            }
-          };
-          fileReader.readAsBinaryString(files[key]);
-        });
+              this.topicGroups.push(this.submitTopic);
+            });
+            console.log(this.topicGroups);
+            /**
+             * 在这里上传, Array<object> 形式
+             */
+            // 上传结束后清空数据
+            this.clearData();
+          } catch (error) {
+            this.errorMsg = error;
+            console.log(error);
+          }
+        };
+        fileReader.readAsBinaryString(files[0]);
       }
     },
   },
@@ -391,9 +381,27 @@ export default {
           .choice-content
             width 200px
       .img-part
+        display flex
+        flex-direction column
+        align-items center
         width 80%
+        margin 0 auto
         padding 2rem
+        .img-groups
+          width 100%
+          height 280px
+          margin-top 1rem
+          overflow-y auto
       .annex-part
+        display flex
+        flex-direction column
+        align-items center
         width 80%
+        margin 0 auto
         padding 2rem
+        .annex-groups
+          width 100%
+          height 280px
+          margin-top 1rem
+          overflow-y auto
 </style>
