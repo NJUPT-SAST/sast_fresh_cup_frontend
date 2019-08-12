@@ -191,7 +191,8 @@ export default new Vuex.Store({
     },
     handleUpdate(state, newState) {
     },
-    handleAnswerChange(state, value, index) {
+    handleAnswerChange(state, { value, index }) {
+      state.questionArray[index].answer = value;
     },
     injectCommitted(state, newQuestionArray) {
     },

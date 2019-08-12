@@ -38,6 +38,7 @@
 </template>
 <script>
 import { getHash } from '../api/index';
+import globalNotification from '../utils/globalNotification';
 
 export default {
   name: 'ToolBar',
@@ -68,6 +69,8 @@ export default {
       if (oldHash !== newHash) {
         await this.$store.dispatch('update', newHash);
         this.showSnackbar = true;
+        const { title, content } = this.$store.state.noticeArray[0];
+        globalNotification(title, content);
       }
     }, 60000); // 目前是一分钟轮询一次
   },

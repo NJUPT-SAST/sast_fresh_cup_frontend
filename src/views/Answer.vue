@@ -13,7 +13,7 @@
     <div class="answer-content">
       <fab-group />
       <div ref="content">
-        <v-card class="anwer-content-card">
+        <v-card class="answer-content-card">
           <v-card-title class="answer-content-card-title">
             {{questionList[selectedIndex].title}}
           </v-card-title>
@@ -48,7 +48,7 @@
             </div>
           </v-card-text>
         </v-card>
-        <v-card class="anwer-content-card">
+        <v-card class="answer-content-card">
           <v-textarea
             outlined
             label="请填写答案"
@@ -57,6 +57,7 @@
             :value="questionList[selectedIndex].answer"
             @input="handleValueChange"
             v-if="!questionList[selectedIndex].options.length"
+            class="answer-content-card-textarea"
           ></v-textarea>
           <v-radio-group
             v-else
@@ -118,7 +119,11 @@ export default {
       window.open(target, '_blank');
     },
     handleValueChange(e) {
-      this.$store.commit('handleAnswerChange', e, this.selectedIndex);
+      this.$store.commit({
+        type: 'handleAnswerChange',
+        value: e,
+        index: this.selectedIndex,
+      });
       this.handleTyping(e);
     },
     handleQuestionSwitch(isUp = true) {
@@ -175,6 +180,8 @@ export default {
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
 
+.v-label--active
+  font-size 23px
 
 .answer-container
   display flex
@@ -196,9 +203,13 @@ export default {
     padding-bottom 40px
     background-color #f5f5f5
     z-index 1
-    .anwer-content-card
+    .answer-content-card
       margin-top 1rem
       padding 1rem
+      .answer-content-card-textarea textarea
+        font-size 23px
+        line-height 1.3
+        letter-spacing 2px
       .answer-content-card-title
         font-size 36px
       .answer-content-card-text
@@ -221,4 +232,5 @@ export default {
       padding-left 20px
       padding-right 20px
       justify-content space-between
+      margin-top 20px
 </style>
