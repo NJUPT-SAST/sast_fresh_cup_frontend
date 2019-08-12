@@ -1,6 +1,6 @@
 <template>
   <div class="admin">
-    <v-navigation-drawer clipped permanent style="width: 15vw; height: calc(100vh - 80px)">
+    <v-navigation-drawer clipped permanent width="250" height="calc(100vh - 80px)">
       <v-list dense>
         <v-list-tile @click="changeStatus('announcement')">
           <v-list-tile-action>
@@ -20,6 +20,15 @@
           </v-list-tile-content>
         </v-list-tile>
         <v-divider></v-divider>
+        <v-list-tile @click="changeStatus('addTopic')">
+          <v-list-tile-action>
+            <v-icon>add_circle_outline</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title style="letter-spacing: 2px">题目添加</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider></v-divider>
         <v-list-tile @click="changeStatus('editTopic')">
           <v-list-tile-action>
             <v-icon>edit</v-icon>
@@ -35,6 +44,7 @@
       <template v-if="status === ''">欢迎，点击左侧菜单进行操作</template>
       <announcement v-if="status === 'announcement'"/>
       <set-match-time v-else-if="status === 'setMatchTime'"/>
+      <add-topic v-else-if="status === 'addTopic'"/>
       <edit-topic v-else-if="status === 'editTopic'"/>
     </div>
   </div>
@@ -43,12 +53,14 @@
 <script>
 import Announcement from '../components/Announcement';
 import SetMatchTime from '../components/SetMatchTime';
+import AddTopic from '../components/AddTopic';
 import EditTopic from '../components/EditTopic';
 
 export default {
   components: {
     Announcement,
     SetMatchTime,
+    AddTopic,
     EditTopic,
   },
   data: () => ({
