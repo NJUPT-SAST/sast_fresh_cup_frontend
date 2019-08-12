@@ -13,7 +13,7 @@
     <div class="answer-content">
       <fab-group />
       <div ref="content">
-        <v-card class="anwer-content-card">
+        <v-card class="answer-content-card">
           <v-card-title class="answer-content-card-title">
             {{questionList[selectedIndex].title}}
           </v-card-title>
@@ -47,21 +47,39 @@
               </v-btn>
             </div>
           </v-card-text>
+        </v-card>
+        <v-card class="answer-content-card">
           <v-textarea
             outlined
             label="请填写答案"
             rows="10"
             no-resize
             :value="questionList[selectedIndex].answer"
-            @input="handleTextChange"
+            @input="handleValueChange"
+            v-if="!questionList[selectedIndex].options.length"
+            class="answer-content-card-textarea"
           ></v-textarea>
+          <v-radio-group
+            v-else
+            :mandatory="false"
+            @change="handleValueChange"
+            :value="questionList[selectedIndex].answer"
+          >
+            <v-radio
+              v-for="(option,index) in questionList[selectedIndex].options"
+              :key="index"
+              :label="option"
+              :value="option"
+            ></v-radio>
+          </v-radio-group>
           <v-card-actions class="answer-content-card-action">
             <v-btn
               color="grey"
               style="margin-right:40px;color:white"
-              @click="answer= ''"
+              @click="questionList[selectedIndex].answer= ''"
             >重置</v-btn>
           </v-card-actions>
+
         </v-card>
       </div>
       <div class="answer-content-btn-container">
@@ -100,8 +118,12 @@ export default {
     newTab(target) {
       window.open(target, '_blank');
     },
-    handleTextChange(e) {
-      this.$store.commit('handleAnswerChange', e, this.selectedIndex);
+    handleValueChange(e) {
+      this.$store.commit({
+        type: 'handleAnswerChange',
+        value: e,
+        index: this.selectedIndex,
+      });
       this.handleTyping(e);
     },
     handleQuestionSwitch(isUp = true) {
@@ -115,9 +137,9 @@ export default {
   },
   watch: {
     selectedIndex() {
-      if (this.$refs.content) {
+      if (this.$refs.content.classList) {
         this.$refs.content.classList.remove('animated', 'fadeIn');
-        setInterval(() => {
+        setTimeout(() => {
           this.$refs.content.classList.add('animated', 'fadeIn');
         });
       }
@@ -145,6 +167,22 @@ export default {
 </script>
 
 <style lang="stylus">
+::-webkit-scrollbar
+  width: 10px;
+/* 滚动槽 */
+::-webkit-scrollbar-track
+  background-color #ECEFF1
+  border-radius: 4px;
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb
+  border-radius: 4px;
+  background: #bbb;
+// ::-webkit-scrollbar-thumb:window-inactive
+//   background: rgba(255,0,0,0.4);
+
+.v-label--active
+  font-size 23px
+
 .answer-container
   display flex
   .answer-sidebar-container
@@ -165,12 +203,16 @@ export default {
     padding-bottom 40px
     background-color #f5f5f5
     z-index 1
-    .anwer-content-card
+    .answer-content-card
+      margin-top 1rem
       padding 1rem
+      .answer-content-card-textarea textarea
+        font-size 23px
+        line-height 1.3
+        letter-spacing 2px
       .answer-content-card-title
         font-size 36px
       .answer-content-card-text
-        min-height 40vh
         font-size 18px
       .answer-content-card-img-container
         margin 0 auto
@@ -190,4 +232,5 @@ export default {
       padding-left 20px
       padding-right 20px
       justify-content space-between
+      margin-top 20px
 </style>
