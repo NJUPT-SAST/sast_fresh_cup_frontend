@@ -1,5 +1,5 @@
 <template>
-  <v-card class="matchTime">
+  <v-card class="matchTime elevation-3">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isSetSuccess? 'success' : 'error'"
@@ -116,6 +116,7 @@ export default {
 <style lang="stylus">
 .matchTime
   padding 3rem
+  width 90%
   height auto
   .headline
     margin-bottom 2rem

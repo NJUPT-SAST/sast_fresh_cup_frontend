@@ -1,5 +1,5 @@
 <template>
-  <div class="editTopic">
+  <div class="editTopic elevation-3">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isSubmitSuccess? 'success' : 'error'"
@@ -7,18 +7,6 @@
       top
       :timeout="3000"
     >{{isSubmitSuccess? "修改成功！" : "修改失败，服务异常！"}}</v-snackbar>
-    <!-- <v-btn
-      fab
-      dark
-      color="success"
-      fixed
-      bottom
-      right
-      :loading="isSubmiting"
-      :disable="isSubmiting"
-    >
-      <v-icon dark>check</v-icon>
-    </v-btn>-->
     <v-toolbar color="cyan" dark tabs>
       <v-toolbar-title>题目编辑</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -40,7 +28,7 @@
     </v-toolbar>
     <v-tabs-items v-model="activeTab">
       <v-tab-item v-for="(topic, index) in topicGroups" :key="index">
-        <v-card flat class="topic elevation-5">
+        <v-card class="topic">
           <v-card-title primary-title>
             <div class="headline">{{topic.title}}</div>
           </v-card-title>
@@ -207,16 +195,13 @@ export default {
 
 <style lang="stylus">
 .editTopic
-  width 100%
-  height 100%
-  margin-left 2rem
-  margin-right 2rem
+  width 95%
   .topic
-    padding 0 2rem 1rem
-    height 69vh
-    overflow-y auto
+    padding 0 2rem .5rem
+    // height calc(100vh - 80px - 2rem - 112px - 2rem)
+    height 520px
     .topic-content
-      margin-bottom 2rem
+      margin-bottom 1.5rem
       height 140px
       display -webkit-box
       -webkit-box-orient vertical

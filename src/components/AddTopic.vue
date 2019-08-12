@@ -1,5 +1,5 @@
 <template>
-  <v-card class="addTopic">
+  <v-card class="addTopic elevation-3">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isSubmitSuccess? 'success' : 'error'"
@@ -46,19 +46,19 @@
           box
           label="题目内容"
           prepend-inner-icon="notes"
-          height="49vh"
+          height="370"
         />
       </div>
       <v-card class="right-part">
         <v-tabs
           v-model="activeTab"
           color="primary"
-          slider-color=yellow
+          slider-color="yellow"
           dark
           style="width: 100%"
-          grow
+          show-arrows
         >
-          <v-tab v-for="(tab, index) in tabsOptions" :key="index">{{tab}}</v-tab>
+          <v-tab v-for="(tab, index) in tabsOptions" :key="index" style="width: 33%">{{tab}}</v-tab>
           <v-tab-item>
             <div class="choice-part">
               <v-btn flat icon color="primary" @click="addOption" style="margin-bottom: 1rem">
@@ -106,23 +106,25 @@
                     <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
                   </v-subheader>
                   <v-divider light></v-divider>
-                  <v-list-tile v-for="(item, index) in imageGroups" :key="index" @click.stop>
-                    <v-list-tile-content>
-                      <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-action>
-                      <v-btn
-                        fab
-                        ripple
-                        color="error"
-                        style="width: 30px; height: 30px;"
-                        @click="removeOption"
-                        :id="index"
-                      >
-                        <v-icon dark :id="index">clear</v-icon>
-                      </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
+                  <div class="img-list">
+                    <v-list-tile v-for="(item, index) in imageGroups" :key="index" @click.stop>
+                      <v-list-tile-content>
+                        <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
+                      </v-list-tile-content>
+                      <v-list-tile-action>
+                        <v-btn
+                          fab
+                          ripple
+                          color="error"
+                          style="width: 30px; height: 30px;"
+                          @click="removeOption"
+                          :id="index"
+                        >
+                          <v-icon dark :id="index">clear</v-icon>
+                        </v-btn>
+                      </v-list-tile-action>
+                    </v-list-tile>
+                  </div>
                 </v-list>
               </v-card>
             </div>
@@ -143,23 +145,25 @@
                     <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
                   </v-subheader>
                   <v-divider light></v-divider>
-                  <v-list-tile v-for="(item, index) in annexGroups" :key="index" @click.stop>
-                    <v-list-tile-content>
-                      <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-action>
-                      <v-btn
-                        fab
-                        ripple
-                        color="error"
-                        style="width: 30px; height: 30px;"
-                        @click="removeOption"
-                        :id="index"
-                      >
-                        <v-icon dark :id="index">clear</v-icon>
-                      </v-btn>
-                    </v-list-tile-action>
-                  </v-list-tile>
+                  <div class="annex-list">
+                    <v-list-tile v-for="(item, index) in annexGroups" :key="index" @click.stop>
+                      <v-list-tile-content>
+                        <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
+                      </v-list-tile-content>
+                      <v-list-tile-action>
+                        <v-btn
+                          fab
+                          ripple
+                          color="error"
+                          style="width: 30px; height: 30px;"
+                          @click="removeOption"
+                          :id="index"
+                        >
+                          <v-icon dark :id="index">clear</v-icon>
+                        </v-btn>
+                      </v-list-tile-action>
+                    </v-list-tile>
+                  </div>
                 </v-list>
               </v-card>
             </div>
@@ -334,10 +338,8 @@ export default {
 <style lang="stylus">
 .addTopic
   padding 3rem
-  width 103%
-  height 100%
-  overflow-x auto
-  overflow-y auto
+  width 93%
+  height 600px
   .headline
     margin-bottom 0.5rem
     .upload-btn
@@ -347,11 +349,9 @@ export default {
     display flex
     flex-direction row
     justify-content space-between
-    width 70vw
+    width 100%
     .left-part
       width 40%
-      .department-choice
-        width 50%
       .topic-title
         width 80%
         margin-bottom 1rem
@@ -359,12 +359,12 @@ export default {
       display flex
       flex-wrap wrap
       justify-content space-between
-      width 50%
-      height 60vh
-      margin-right 1rem
-      overflow-y auto
+      width 48%
+      height 450px
       .choice-part
         padding 2rem
+        height 402px
+        overflow-y auto
         .topic-choice-groups
           display flex
           flex-direction row
@@ -391,7 +391,9 @@ export default {
           width 100%
           height 280px
           margin-top 1rem
-          overflow-y auto
+          .img-list
+            height 224px
+            overflow-y auto
       .annex-part
         display flex
         flex-direction column
@@ -403,5 +405,7 @@ export default {
           width 100%
           height 280px
           margin-top 1rem
-          overflow-y auto
+          .annex-list
+            height 224px
+            overflow-y auto
 </style>

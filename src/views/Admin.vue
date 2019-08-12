@@ -1,6 +1,11 @@
 <template>
   <div class="admin">
-    <v-navigation-drawer clipped permanent width="250" height="calc(100vh - 80px)">
+    <v-navigation-drawer
+      clipped
+      permanent
+      style="width: 15vw; height: calc(100vh - 80px)"
+      class="elevation-2"
+    >
       <v-list dense>
         <v-list-tile @click="changeStatus('announcement')">
           <v-list-tile-action>
@@ -77,9 +82,14 @@ export default {
 <style lang="stylus">
 .admin
   display flex
+  height calc(100vh - 80px)
   .detail
-    margin-top 2rem
-    margin-left 2rem
-    width 75vw
-    height 82vh
+    padding 2rem
+    padding-right 0
+    width 85vw
+    height calc(100vh - 80px)
+    overflow-x hidden
+    overflow-y auto
+  .detail::-webkit-scrollbar
+    width 0 !important
 </style>
