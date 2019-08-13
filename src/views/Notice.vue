@@ -1,54 +1,31 @@
 <template>
   <div>
-    <v-card v-for="(notice,i) in noticeArray" :key="i">
-       <v-checkbox v-model="checkbox[i]"></v-checkbox>
+    <v-card v-for="(notice,i) in notice" :key="i">
       <div  @click="check(i)">
-      <img src="../assets/NEW.png" alt="" v-if="!noticeArray[i].checked">
+      <img src="../assets/NEW.png" alt="" v-if="!notice.checked">
       <v-card-title class="card_title">{{notice.title}}<span>{{notice.time}}</span></v-card-title>
-      <div class="link-top" v-show="noticeArray[i].checkContent"></div>
-      <v-card-text v-show="noticeArray[i].checkContent">{{notice.content}}</v-card-text>
+      <div class="link-top"></div>
+      <v-card-text>{{notice.content}}</v-card-text>
       </div>
     </v-card>
-     <v-checkbox v-model="checkbox[0]"></v-checkbox>
-     <v-checkbox v-model="checkbox[1]"></v-checkbox>   
-    <img src="../assets/rubbish.png" width="50" class="dustbin" @click="clean">
   </div>
 </template>
 <script>
-   import Vue from 'vue'
-   export default{
-      data () {
-        return {
-          noticeArray:[],
-          checkbox:[]
-        }
-      },
-     computed:{
-        notice(){
-          return this.$store.state.noticeArray
-        },
-     },
-      mounted(){
-        this.noticeArray = this.notice.reverse()
-        for(let i=0;i<this.noticeArray.length;i++){
-           this.noticeArray[i]['checkContent'] =  false
-           this.noticeArray[i]['checked'] =  false
-        }
-      },
-     methods:{
-       check: function(i){
-         let newItem = this.noticeArray[i]
-         newItem.checkContent = !this.noticeArray[i].checkContent
-         newItem.checked = true
-         this.$store.commit('handleReadNotice',i) 
-         console.log(this.$store.state.readNoticeArray)
-         Vue.set(this.noticeArray, i, newItem)   //Vue无法检测数组的更改，正确的方法就是调用vue提供的set方法。这样才能触发视图更新(踩坑！)
-       },
-       clean: function(){
 
-       }
-     }
-   }
+export default {
+  computed: {
+    notice() {
+      const { noticeArray, readNoticeArray } = this.$store.state;
+      const readNoticeArrayId = readNoticeArray.map(item => item.id);
+      return noticeArray.map((item) => {
+        if (readNoticeArrayId.includes(item.id)) {
+          return { ...item, checked: true };
+        }
+        return { ...item, checked: false };
+      });
+    },
+  },
+};
 </script>
 <style scoped>
   .v-alert{

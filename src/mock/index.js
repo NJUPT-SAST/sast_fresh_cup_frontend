@@ -25,6 +25,26 @@ export default new Vuex.Store({
         content: 'content2',
         time: 1565247405,
       },
+      {
+        id: 2,
+        title: 'title',
+        content: 'content',
+        time: 1565247405,
+      },
+      {
+        id: 3,
+        title: 'title2',
+        content: 'content2',
+        time: 1565247405,
+      },
+    ],
+    readNoticeArray: [
+      {
+        id: 1,
+        title: 'title2',
+        content: 'content2',
+        time: 1565247405,
+      },
     ],
     questionArray: [
       {
@@ -172,22 +192,17 @@ export default new Vuex.Store({
       start: Date.now() - 1200000,
       end: Date.now() + 2400000,
     },
-    readNoticeArray: [
-      {
-        id: 14,
-        title: 'question4',
-        content: '12这是一道题目的内容，它很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
-        answer: '',
-      },
-    ],
     hash: '5D41402ABC4B2A76B9719D911017C592',
   },
   getters: {
     unreadNoticeCount(state) {
+      const { noticeArray, readNoticeArray } = state;
+      return noticeArray.length - readNoticeArray.length;
     },
   },
   mutations: {
     handleReadNotice(state) {
+      state.readNoticeArray = state.noticeArray;
     },
     handleUpdate(state, newState) {
     },
