@@ -28,25 +28,13 @@
     </v-toolbar>
     <v-tabs-items v-model="activeTab">
       <v-tab-item v-for="(topic, index) in topicGroups" :key="index">
-        <v-card class="topic">
-          <v-card-title primary-title>
-            <div class="headline">{{topic.title}}</div>
-          </v-card-title>
-          <v-hover>
-            <v-card-text class="grey--text topic-content" slot-scope="{ hover }">
-              {{topic.content}}
-              <v-expand-transition>
-                <div
-                  @click="showMoreContent"
-                  v-if="hover"
-                  style="height: 100%"
-                  class="grey d-flex darken-2 display-3 white--text more-content-reveal"
-                >
-                  <v-icon dark x-large>more_horiz</v-icon>
-                </div>
-              </v-expand-transition>
-            </v-card-text>
-          </v-hover>
+        <v-card class="topic elevation-3">
+          <div class="top-part">
+            <v-card-title primary-title>
+              <div class="headline">{{topic.title}}</div>
+            </v-card-title>
+            <v-card-text class="grey--text topic-content">{{topic.content}}</v-card-text>
+          </div>
           <div class="file-part">
             <div class="img-groups">
               <v-card color="cyan lighten-3 img-show">
@@ -117,6 +105,10 @@ export default {
     isSubmitSuccess: false,
     isSubmiting: false,
     isEditing: false,
+    // 题干是否变化
+    isQuestionChange: false,
+    // 图片或附件是否变化
+    isFileChange: false,
     activeTab: null,
     // 题目ID/标题数组
     questionGroups: [
@@ -196,26 +188,35 @@ export default {
 <style lang="stylus">
 .editTopic
   width 95%
+  margin-top -1rem
   .topic
-    padding 0 2rem .5rem
-    // height calc(100vh - 80px - 2rem - 112px - 2rem)
-    height 520px
-    .topic-content
-      margin-bottom 1.5rem
-      height 140px
-      display -webkit-box
-      -webkit-box-orient vertical
-      -webkit-line-clamp 6
-      overflow hidden
-      position relative
-      .more-content-reveal
-        cursor pointer
-        align-items center
-        bottom 0
-        justify-content center
-        opacity 0.5
-        position absolute
-        width 100%
+    display flex
+    flex-direction column
+    justify-content space-between
+    padding 0 2rem 1rem
+    min-height calc(100vh - 80px - 2rem - 112px - 2rem + 1rem)
+    .top-part
+      display flex
+      flex-direction column
+      justify-content space-between
+      height calc((100vh - 80px - 2rem - 112px - 2rem + 1rem)/2)
+      .topic-content
+        margin-bottom 1.5rem
+        // min-height 19vh
+        // max-height 23vh
+        // display -webkit-box
+        // -webkit-box-orient vertical
+        // -webkit-line-clamp 6
+        overflow-y auto
+        position relative
+        .more-content-reveal
+          cursor pointer
+          align-items center
+          bottom 0
+          justify-content center
+          opacity 0.5
+          position absolute
+          width 100%
     .file-part
       display flex
       justify-content space-between

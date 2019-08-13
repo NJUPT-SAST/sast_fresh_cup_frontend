@@ -84,10 +84,13 @@ export default {
   display flex
   height calc(100vh - 80px)
   .detail
-    padding 2rem
-    padding-right 0
+    display flex
+    justify-content center
+    align-items center
+    flex-wrap wrap
     width 85vw
     height calc(100vh - 80px)
+    padding 2rem 0
     overflow-x hidden
     overflow-y auto
   .detail::-webkit-scrollbar
