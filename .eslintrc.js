@@ -19,7 +19,10 @@ module.exports = {
       args: 'none',
     }],
     indent: [2, 2],
-    'linebreak-style': 'off'
+    'linebreak-style': 'off',
+    'no-nested-ternary': 'off',
+    'radix':'off',
+    'no-plusplus':'off'
   },
   parserOptions: {
     parser: 'babel-eslint',

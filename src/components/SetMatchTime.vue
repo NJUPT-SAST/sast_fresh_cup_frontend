@@ -1,5 +1,5 @@
 <template>
-  <div class="matchTime">
+  <v-card class="matchTime">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isSetSuccess? 'success' : 'error'"
@@ -11,7 +11,7 @@
       fab
       dark
       color="success"
-      absolute
+      fixed
       bottom
       right
       @click="handleSetting"
@@ -71,7 +71,12 @@
         </v-time-picker>
       </v-dialog>
     </div>
-  </div>
+    <div class="btn-groups">
+      <v-btn color="grey lighten-1" @click="handleReset">重置
+        <v-icon right dark>reply</v-icon>
+      </v-btn>
+    </div>
+  </v-card>
 </template>
 
 <script>
@@ -100,19 +105,24 @@ export default {
         this.endTime = null;
       }, 3000);
     },
+    handleReset() {
+      this.startTime = null;
+      this.endTime = null;
+    },
   },
 };
 </script>
 
 <style lang="stylus">
 .matchTime
+  padding 3rem
+  height auto
   .headline
     margin-bottom 2rem
   .time-picker-groups
     width 50%
     margin-bottom 2rem
   .btn-groups
-    width 50%
     display flex
     justify-content flex-end
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-toolbar color="primary" height="80" app clipped-left>
+  <div style="z-index:9">
+    <v-toolbar color="primary" height="80">
       <v-toolbar-title class="toolBar-title" @click="jump('homepage')">
         计算机基础知识竞赛
       </v-toolbar-title>
@@ -37,6 +37,9 @@
   </div>
 </template>
 <script>
+import { getHash } from '../api/index';
+import globalNotification from '../utils/globalNotification';
+
 export default {
   name: 'ToolBar',
   data() {
@@ -46,7 +49,7 @@ export default {
   },
   computed: {
     noticeCount() {
-      return this.$store.state.noticeCount;
+      return this.$store.getters.unreadNoticeCount;
     },
   },
   methods: {
@@ -58,15 +61,24 @@ export default {
       this.jump('notice');
     },
   },
-  mounted() {
-    this.$store.commit('handleNoticeCount', 1); // 到时候替换成对公告接口的轮询，将值与noticeCount对比，有变动再调用commit
-    this.showSnackbar = true;
+  async mounted() {
+    this.$store.dispatch('init');
+    setInterval(async () => {
+      const { hash: oldHash } = this.$store.state;
+      const { data: newHash } = await getHash();
+      if (oldHash !== newHash) {
+        await this.$store.dispatch('update', newHash);
+        this.showSnackbar = true;
+        const { title, content } = this.$store.state.noticeArray[0];
+        globalNotification(title, content);
+      }
+    }, 60000); // 目前是一分钟轮询一次
   },
   watch: {
     // 对于清除公告角标应放置在ToolBar还是Notice，这个后面再看一下
     $route(val) {
       if (val.name === 'notice') {
-        this.$store.commit('handleNoticeCount', 0);
+        this.$store.commit('handleReadNotice');
       }
     },
   },
@@ -78,6 +90,8 @@ export default {
   color white
   margin-left 20px !important
   cursor: pointer
+  user-select none
 .toolBar-btn
   color white
+  user-select none
 </style>
