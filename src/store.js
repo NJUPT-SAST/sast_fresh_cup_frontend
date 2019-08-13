@@ -25,8 +25,8 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    handleReadNotice(state) {
-      state.readNoticeArray = state.noticeArray;
+    handleReadNotice(state,i) {
+      state.readNoticeArray.push(state.noticeArray[i]);
     },
     handleUpdate(state, newState) {
       Object.keys(newState).forEach((key) => {

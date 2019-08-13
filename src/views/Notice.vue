@@ -40,7 +40,8 @@
          let newItem = this.noticeArray[i]
          newItem.checkContent = !this.noticeArray[i].checkContent
          newItem.checked = true
-         this.$store.commit('handleReadNotice') 
+         this.$store.commit('handleReadNotice',i) 
+         console.log(this.$store.state.readNoticeArray)
          Vue.set(this.noticeArray, i, newItem)   //Vue无法检测数组的更改，正确的方法就是调用vue提供的set方法。这样才能触发视图更新(踩坑！)
        },
        clean: function(){
