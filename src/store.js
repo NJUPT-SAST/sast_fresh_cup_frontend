@@ -7,26 +7,38 @@ import {
 
 Vue.use(Vuex);
 
+const injectAnswer = (questionArray, submittedArray) => {
+  const submittedMap = new Map(
+    submittedArray.map(item => [item.problem_id, { content: item.content, option: item.option }]),
+  );
+  return questionArray.map((item) => {
+    let answer = submittedMap.get(item.id);
+    if (!answer) answer = { content: '', option: '' };
+    return { ...item, answer };
+  });
+};
+
 export default new Vuex.Store({
   state: {
     noticeArray: [],
     questionArray: [],
     due: {
-      start: undefined,
-      end: undefined,
+      start: 0,
+      end: 0,
     },
     readNoticeArray: [],
     hash: {
-      problemsMd5: undefined,
-      noticesMd5: undefined,
+      problemsMd5: '',
+      noticesMd5: '',
     },
-    name: undefined,
+    name: '',
     userinfo: {
-      id: undefined,
-      username: undefined,
-      email: undefined,
-      isAdmin: undefined,
+      id: 0,
+      username: '',
+      email: '',
+      isAdmin: 0,
     },
+    submittedArray: [],
   },
   getters: {
     unreadNoticeCount(state) {
@@ -54,6 +66,9 @@ export default new Vuex.Store({
         state.userinfo[key] = data[key];
       });
     },
+    handleSubmittedInit(state, newSubmitted) {
+      state.submittedArray = newSubmitted;
+    },
   },
   actions: {
     async update({ commit, state }) {
@@ -68,32 +83,32 @@ export default new Vuex.Store({
         name: oldName, due: { start: oldStart, end: oldEnd },
         hash: { problemsMd5: oldProblemMd5, noticesMd5: oldNoticeMd5 },
       } = state;
+
       if (problemsMd5 !== oldProblemMd5) requestList.push(getQuestions);
       if (noticesMd5 !== oldNoticeMd5) requestList.push(getNotice);
       if (name !== oldName) newState.name = name;
       if (start !== oldStart || end !== oldEnd) newState.due = { start, end };
+      newState.hash = { problemsMd5, noticesMd5 };
+
       const response = await Promise.all(requestList.map(item => item()));
       if (response.length) {
         requestList.forEach((item, index) => {
-          if (item === getQuestions) newState.questionArray = response[index].data;
+          if (item === getQuestions) {
+            newState.questionArray = injectAnswer(response[index].data, state.submittedArray);
+          }
           if (item === getNotice) newState.noticeArray = response[index].data;
         });
       }
+
       commit('handleUpdate', newState);
     },
-    async init({ dispatch, state, commit }) {
+    async init({ dispatch, commit }) {
       await dispatch('update');
       const tempQuestionArray = this.state.questionArray;
       const { data: submitted } = await getSubmitted();
-      const submittedKeys = submitted.map(item => item.problem_id);
-      const newQuestionArray = tempQuestionArray.map((item, index) => {
-        if (submittedKeys.includes(item.id)) {
-          const { option, content } = submitted[index];
-          return { ...item, answer: { option, content } };
-        }
-        return { ...item, answer: { option: '', content: '' } };
-      });
+      const newQuestionArray = injectAnswer(tempQuestionArray, submitted);
       commit('injectCommitted', newQuestionArray);
+      commit('handleSubmittedInit', submitted);
     },
   },
 });

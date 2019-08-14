@@ -101,6 +101,9 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    此处显示一个正在加载
+  </div>
 </template>
 
 <script>
@@ -167,6 +170,7 @@ export default {
   },
   async mounted() {
     await this.$store.dispatch('init');
+    console.log(this.questionList);
   },
 };
 </script>
