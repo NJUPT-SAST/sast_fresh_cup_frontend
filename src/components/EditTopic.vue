@@ -347,8 +347,7 @@ export default {
       this.isSearching = !this.isSearching;
     },
     async handleDeleteTopic() {
-      // 调用删除接口，确认完成后再关闭checkingDialog
-      this.dialog.isOpen = false;
+      this.dialog.isOpen = true;
       this.openDialogType = 'checking';
       this.snackbarType = 'delete';
       const { id } = this.topicGroups[this.activeTab];

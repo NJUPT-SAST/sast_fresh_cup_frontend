@@ -21,7 +21,13 @@
       <v-icon dark>check</v-icon>
     </v-btn>
     <div class="headline">题目添加
-      <v-btn color="blue-grey" class="white--text upload-btn" @click="$refs.upload.click()">
+      <v-btn
+        color="blue-grey"
+        class="white--text upload-btn"
+        @click="$refs.upload.click()"
+        :loading="isUploading"
+        :disabled="isUploading"
+      >
         上传
         <input
           type="file"
@@ -57,8 +63,9 @@
           dark
           style="width: 100%"
           show-arrows
+          grow
         >
-          <v-tab v-for="(tab, index) in tabsOptions" :key="index" style="width: 33%">{{tab}}</v-tab>
+          <v-tab v-for="(tab, index) in tabsOptions" :key="index">{{tab}}</v-tab>
           <v-tab-item>
             <div class="choice-part">
               <v-btn flat icon color="primary" @click="addOption" style="margin-bottom: 1rem">
@@ -89,85 +96,6 @@
               </div>
             </div>
           </v-tab-item>
-          <v-tab-item>
-            <div class="img-part">
-              <input
-                type="file"
-                ref="image"
-                accept=".jpg, .jpeg, .png"
-                name="image"
-                @change="handleFile"
-                style="width: 0; height: 0; visiable: hidden"
-              >
-              <v-btn @click="$refs.image.click()">添加文件</v-btn>
-              <v-card class="img-groups">
-                <v-list subheader>
-                  <v-subheader>
-                    <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
-                  </v-subheader>
-                  <v-divider light></v-divider>
-                  <div class="img-list">
-                    <v-list-tile v-for="(item, index) in imageGroups" :key="index" @click.stop>
-                      <v-list-tile-content>
-                        <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
-                      </v-list-tile-content>
-                      <v-list-tile-action>
-                        <v-btn
-                          fab
-                          ripple
-                          color="error"
-                          style="width: 30px; height: 30px;"
-                          @click="removeOption"
-                          :id="index"
-                        >
-                          <v-icon dark :id="index">clear</v-icon>
-                        </v-btn>
-                      </v-list-tile-action>
-                    </v-list-tile>
-                  </div>
-                </v-list>
-              </v-card>
-            </div>
-          </v-tab-item>
-          <v-tab-item>
-            <div class="annex-part">
-              <input
-                type="file"
-                ref="annex"
-                name="annex"
-                @change="handleFile"
-                style="width: 0; height: 0; visiable: hidden"
-              >
-              <v-btn @click="$refs.annex.click()">添加文件</v-btn>
-              <v-card class="annex-groups">
-                <v-list subheader>
-                  <v-subheader>
-                    <v-icon medium style="margin-right: .5rem">list</v-icon>文件列表
-                  </v-subheader>
-                  <v-divider light></v-divider>
-                  <div class="annex-list">
-                    <v-list-tile v-for="(item, index) in annexGroups" :key="index" @click.stop>
-                      <v-list-tile-content>
-                        <v-list-tile-title v-html="item.fileName"></v-list-tile-title>
-                      </v-list-tile-content>
-                      <v-list-tile-action>
-                        <v-btn
-                          fab
-                          ripple
-                          color="error"
-                          style="width: 30px; height: 30px;"
-                          @click="removeOption"
-                          :id="index"
-                        >
-                          <v-icon dark :id="index">clear</v-icon>
-                        </v-btn>
-                      </v-list-tile-action>
-                    </v-list-tile>
-                  </div>
-                </v-list>
-              </v-card>
-            </div>
-          </v-tab-item>
         </v-tabs>
       </v-card>
     </div>
@@ -176,14 +104,15 @@
 
 <script>
 import XLSX from 'xlsx';
+import { modifyQuestions, modifyQuestionsMassively } from '../api/index';
 
 export default {
   data: () => ({
     isSnackBarShow: false,
     isSubmitSuccess: false,
+    isUploading: false,
     isSubmiting: false,
-    errorMsg: '',
-    tabsOptions: ['选项', '图片', '附件'],
+    tabsOptions: ['选项'],
     activeTab: null,
     topicChoice: [
       { label: '选项一', content: '', deleteBtn: false },
@@ -191,15 +120,11 @@ export default {
       { label: '选项三', content: '', deleteBtn: false },
       { label: '选项四', content: '', deleteBtn: false },
     ],
-    imageGroups: [],
-    annexGroups: [],
     // 提交单道题目时使用
     submitTopic: {
       title: '',
       content: '',
       options: [],
-      images: [],
-      annexs: [],
     },
     // 上传Excel时将 submitTopic push 进这个数组，用 Array<object> 提交
     topicGroups: [],
@@ -241,91 +166,80 @@ export default {
         title: '',
         content: '',
         options: [],
-        image: [],
-        annex: [],
       };
       this.topicGroups = [];
     },
-    handleFile(e) {
-      const { name, files } = e.target;
-      if (files.length !== 0) {
-        if (name === 'image') {
-          this.imageGroups.push({
-            fileName: files[0].name,
-            file: files[0],
-          });
-        } else if (name === 'annex') {
-          this.annexGroups.push({
-            fileName: files[0].name,
-            file: files[0],
-          });
-        }
-      }
-    },
-    handleSubmit() {
+    async handleSubmit() {
       this.isSubmiting = true;
       this.topicChoice.forEach((item) => {
         if (item.content !== '') {
           this.submitTopic.options.push(item.content);
         }
       });
-      this.imageGroups.forEach((item) => {
-        if (item.file !== null) {
-          this.submitTopic.images.push(item.file);
-        }
-      });
-      this.annexGroups.forEach((item) => {
-        if (item.file !== null) {
-          this.submitTopic.annexs.push(item.file);
-        }
-      });
-      console.log(this.submitTopic);
-      setTimeout(() => {
-        this.isSubmiting = false;
-        this.isSnackBarShow = true;
-        this.isSubmitSuccess = false; // true
-        this.clearData();
-      }, 3000);
+      const { title, content, options } = this.submitTopic;
+      await modifyQuestions(title, content, options)
+        .then((res) => {
+          this.isSubmiting = false;
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.clearData();
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.isSubmitSuccess = false;
+          this.isSubmiting = false;
+          this.isSnackBarShow = true;
+        });
     },
     handleUpload(e) {
+      this.isUploading = true;
       const { files } = e.target;
       if (files.length !== 0) {
         const fileReader = new FileReader();
-        fileReader.onload = (ev) => {
+        fileReader.onload = async (ev) => {
           try {
             const data = ev.target.result;
             const workbook = XLSX.read(data, { type: 'binary' });
             const workSheetName = workbook.SheetNames[0];
             const sheetOutput = XLSX.utils.sheet_to_json(workbook.Sheets[workSheetName]);
             sheetOutput.forEach((item) => {
-              // push 进一题后清空(批量添加时不需要 image 和 annex)
-              this.submitTopic = {
+              const tempSubmitTopic = {
                 title: '',
                 content: '',
                 options: [],
               };
               Object.keys(item).forEach((itemKey) => {
                 if (itemKey.indexOf('标题') !== -1) {
-                  this.submitTopic.title = item[itemKey];
+                  tempSubmitTopic.title = item[itemKey];
                 } else if (itemKey.indexOf('内容') !== -1) {
-                  this.submitTopic.content = item[itemKey];
+                  tempSubmitTopic.content = item[itemKey];
                 } else if (itemKey.indexOf('选项') !== -1) {
                   if (item[itemKey] !== '') {
-                    this.submitTopic.options.push(item[itemKey]);
+                    tempSubmitTopic.options.push(item[itemKey]);
                   }
                 }
               });
-              this.topicGroups.push(this.submitTopic);
+              this.topicGroups.push(tempSubmitTopic);
             });
-            console.log(this.topicGroups);
-            /**
-             * 在这里上传, Array<object> 形式
-             */
-            // 上传结束后清空数据
-            this.clearData();
+            await modifyQuestionsMassively(this.topicGroups).then((res) => {
+              this.isUploading = false;
+              this.isSnackBarShow = true;
+              const { ret, desc } = res;
+              if (ret === 200 && desc === 'successful') {
+                this.clearData();
+                this.isSubmitSuccess = true;
+              } else {
+                this.isSubmitSuccess = false;
+              }
+            });
           } catch (error) {
-            this.errorMsg = error;
-            console.log(error);
+            this.isUploading = false;
+            this.isSnackBarShow = true;
+            this.isSubmitSuccess = false;
           }
         };
         fileReader.readAsBinaryString(files[0]);
