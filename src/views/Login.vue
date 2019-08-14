@@ -72,7 +72,7 @@ export default {
         });
         setInterval(() => {
           this.$store.dispatch('update');
-        }, 60000);
+        }, 10000);
         await this.$store.dispatch('init');
         if (isAdmin) {
           this.$router.push({ name: 'admin' });

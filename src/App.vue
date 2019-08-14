@@ -23,6 +23,7 @@ export default {
   async mounted() {
     window.api = api;
     window.store = this.$store;
+    // 这两行代码是测试使用的
   },
 };
 </script>
