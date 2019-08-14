@@ -1,45 +1,56 @@
 import axios from 'axios';
 
-const baseURL = 'https://wyzwb.com/api'; // 开发环境地址
+const baseURL = 'https://contestease.wyzwb.com'; // 开发环境地址
+const clientSecret = 'lDCcVZDe8aPgBKK2Z3FfUXUMDHLXBj49GVB4ArkA';
 
-
-const instance = axios.create({
-  baseURL,
-  withCredentials: true,
+let instance = axios.create({
+  baseURL: `${baseURL}/api`,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('fresh_cup_token')}`,
+  },
 });
 
-const postData = (obj) => {
-  const data = new FormData();
-  Object.keys(obj).forEach((key) => {
-    data.append(key, obj[key]);
+
+export const login = (username, password) => axios.post(`${baseURL}/oauth/token`, {
+  client_secret: clientSecret, username, password, grant_type: 'password', client_id: 2,
+}).then((response) => {
+  const { access_token: token } = response.data;
+  localStorage.setItem('fresh_cup_token', token);
+  instance = axios.create({
+    baseURL: `${baseURL}/api`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-  return data;
-};
+  return { ret: 200, data: { ...response.data } };
+}).catch(() => ({ ret: 400, data: {} }));
 
-export const getHash = () => instance.get('/hash');
+export const getHash = () => instance.get('/status').then(res => res.data);
 
-export const login = (username, password) => instance.post('/login', postData({ username, password }));
+export const userinfo = () => instance.get('/user').then(res => res.data);
 
-export const getNotice = () => instance.get('/notice');
+export const getNotice = () => instance.get('/notice').then(res => res.data);
 
-export const getDue = () => instance.get('/due');
+export const getQuestions = () => instance.get('/questions').then(res => res.data);
 
-export const getQuestions = () => instance.get('/questions');
+export const getSubmitted = () => instance.get('/submitted').then(res => res.data);
 
-export const getSubmitted = () => instance.get('/submited');
+export const submit = (id, content) => instance.post('/submit', ({ problem_id: id, content })).then(res => res.data);
 
-export const submit = (id, content) => instance.post('/submit', postData({ id, content }));
+export const modifyNotice = (title, content, id) => instance.post('/admin/modifyNotice', ((id === undefined ? { title, content } : { id, title, content }))).then(res => res.data);
 
-export const handIn = () => instance.post('/handIn', postData({ handIn: true }));
+export const modifyDue = newDue => instance.post('/admin/modifyDue', ({ ...newDue })).then(res => res.data);
 
-export const modifyNotice = (title, content, id) => instance.post('/admin/modifyNotice', postData((id === undefined ? { title, content } : { id, title, content })));
-
-export const modifyDue = newDue => instance.post('/admin/modifyDue', postData({ newDue }));
-
-export const modifyQuestions = (title, content, image, attachment, id) => instance.post('/admin/modifyQuestions', postData(id === undefined ? {
-  title, content, image, attachment,
+export const modifyQuestions = (title, content, options, id) => instance.post('/admin/modifyQuestions', (id === undefined ? {
+  title, content, options,
 } : {
-  title, content, image, attachment, id,
-}));
+  title, content, options, id,
+})).then(res => res.data);
 
-export const modifyQuestionsMassively = questionsArray => instance.post('/admin/modifyQuestionsMassively', postData({ questionsArray }));
+export const modifyQuestionsMassively = questions => instance.post('/admin/modifyQuestionsMassively', ({ questions })).then(res => res.data);
+
+export const addSource = (problemId, type, name, source) => instance.post('/admin/addSource', {
+  problem_id: problemId, type, name, source,
+}).then(res => res.data);
+
+export const deleteSource = url => instance.post('/admin/deleteSource', { url }).then(res => res.data);
