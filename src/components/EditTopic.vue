@@ -311,7 +311,7 @@ export default {
   },
   async mounted() {
     this.isGettingQuestions = true;
-    await this.$store.dispatch('init').then((res) => {
+    await this.$store.dispatch('update').then((res) => {
       this.isGettingQuestions = false;
       this.isGetQuestionsSuccess = true;
     });

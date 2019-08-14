@@ -189,11 +189,10 @@ export default {
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
 
-.v-label--active
-  font-size 23px
-
 .answer-container
   display flex
+  .v-label--active
+    font-size 23px
   .answer-sidebar-container
     padding-top 10px
     height calc(100vh - 80px)

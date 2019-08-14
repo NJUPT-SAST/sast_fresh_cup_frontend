@@ -76,6 +76,9 @@ export default {
       this.status = status;
     },
   },
+  async mounted() {
+    await this.$store.dispatch('init');
+  },
 };
 </script>
 
