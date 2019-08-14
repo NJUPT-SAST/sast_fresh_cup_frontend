@@ -201,16 +201,6 @@
                 <v-btn icon v-if="isEditing" @click="$refs.image.click()">
                   <v-icon>add_photo_alternate</v-icon>
                 </v-btn>
-                <v-btn
-                  icon
-                  v-if="isEditing"
-                  @click.stop="
-                      willDeleteIndex = index;
-                      dialog.isOpen = true;
-                      openDialogType = 'deleteImage'"
-                >
-                  <v-icon>broken_image</v-icon>
-                </v-btn>
               </v-card-title>
               <v-carousel
                 style="width: 100%; height: calc(100% - 48px)"
@@ -224,7 +214,19 @@
                   :key="index"
                   :src="'https://contestease.wyzwb.com'+img.url"
                   style="height: 100%"
-                ></v-carousel-item>
+                >
+                  <v-btn
+                    fab
+                    small
+                    v-if="isEditing"
+                    @click.stop="
+                    willDeleteIndex = index;
+                    dialog.isOpen = true;
+                    openDialogType = 'deleteImage'"
+                  >
+                    <v-icon>broken_image</v-icon>
+                  </v-btn>
+                </v-carousel-item>
               </v-carousel>
               <div class="no-file" v-else>
                 <div class="display-1">无</div>
@@ -350,21 +352,23 @@ export default {
       this.openDialogType = 'checking';
       this.snackbarType = 'delete';
       const { id } = this.topicGroups[this.activeTab];
-      await modifyQuestions(id).then((res) => {
-        this.dialog.isOpen = false;
-        this.isSnackBarShow = true;
-        const { ret, desc } = res;
-        if (ret === 200 && desc === 'successful') {
-          this.$store.dispatch('update');
-          this.isSubmitSuccess = true;
-        } else {
+      await deleteQuestions(id)
+        .then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
           this.isSubmitSuccess = false;
-        }
-      }).catch((err) => {
-        this.dialog.isOpen = false;
-        this.isSnackBarShow = true;
-        this.isSubmitSuccess = false;
-      });
+        });
     },
     async handleAddAnnex(e) {
       const { files } = e.target;
@@ -374,7 +378,12 @@ export default {
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
         this.snackbarType = 'add';
-        await addSource(id, 'attachment', file.name, file)
+        const uploadFile = new FormData();
+        uploadFile.append('problem_id', id);
+        uploadFile.append('type', 'attachment');
+        uploadFile.append('name', file.name);
+        uploadFile.append('source', file);
+        await addSource(uploadFile)
           .then((res) => {
             this.dialog.isOpen = false;
             this.isSnackBarShow = true;
@@ -426,9 +435,40 @@ export default {
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
         this.snackbarType = 'add';
-        await addSource(id, 'image', file.name, file).then((res) => {
+        const uploadFile = new FormData();
+        uploadFile.append('problem_id', id);
+        uploadFile.append('type', 'image');
+        uploadFile.append('name', file.name);
+        uploadFile.append('source', file);
+        await addSource(uploadFile)
+          .then((res) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.$store.dispatch('update');
+              this.isSubmitSuccess = true;
+            } else {
+              this.isSubmitSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            this.isSubmitSuccess = false;
+          });
+      }
+    },
+    async handleDeleteImage() {
+      this.dialog.isOpen = true;
+      this.openDialogType = 'checking';
+      this.snackbarType = 'delete';
+      const { url } = this.topicGroups[this.activeTab].images[this.willDeleteIndex];
+      await deleteSource(url)
+        .then((res) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
+          this.willDeleteIndex = -1;
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
@@ -436,35 +476,13 @@ export default {
           } else {
             this.isSubmitSuccess = false;
           }
-        }).catch((err) => {
+        })
+        .catch((err) => {
           this.dialog.isOpen = false;
-          this.isSnackBarShow = true;
+          this.isSnackShow = true;
           this.isSubmitSuccess = false;
+          this.willDeleteIndex = -1;
         });
-      }
-    },
-    async handleDeleteImage() {
-      this.dialog.isOpen = true;
-      this.openDialogType = 'checking';
-      this.snackbarType = 'delete';
-      const { url } = this.topicGroups[this.activeTab].attachments[this.willDeleteIndex];
-      await deleteSource(url).then((res) => {
-        this.dialog.isOpen = false;
-        this.isSnackBarShow = true;
-        this.willDeleteIndex = -1;
-        const { ret, desc } = res;
-        if (ret === 200 && desc === 'successful') {
-          this.$store.dispatch('update');
-          this.isSubmitSuccess = true;
-        } else {
-          this.isSubmitSuccess = false;
-        }
-      }).catch((err) => {
-        this.dialog.isOpen = false;
-        this.isSnackShow = true;
-        this.isSubmitSuccess = false;
-        this.willDeleteIndex = -1;
-      });
     },
   },
 };
