@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import { hash } from '../api/index';
+import globalNotification from '../utils/globalNotification';
 
 export default {
   name: 'ToolBar',
@@ -61,16 +61,9 @@ export default {
     },
   },
   async mounted() {
-    const hashResponse = await hash();
-    this.$store.dispatch('update', hashResponse.data);
-    setInterval(async () => {
-      const { hash: oldHash } = this.$store.state;
-      const { data: newHash } = await hash();
-      if (oldHash !== newHash) {
-        await this.$store.dispatch('update', newHash);
-        this.showSnackbar = true;
-      }
-    }, 60000); // 目前是一分钟轮询一次
+    if (!localStorage.getItem('fresh_cup_token')) {
+      this.$router.push({ name: 'login' });
+    }
   },
   watch: {
     // 对于清除公告角标应放置在ToolBar还是Notice，这个后面再看一下

@@ -2,8 +2,8 @@
   <v-sheet
     class="side-bar-item"
     :elevation="isFocus ? 7 : 0 "
-    :height="isOver ? 90 : 60"
-    :color="answered ? '#8BC34A' : '#ECEFF1'"
+    :height="isOver ? 80 : 70"
+    :color="answered ? '#039BE5' : '#E0F2F1'"
     :style="itemStyle"
     @click="$emit('click')"
     @mouseenter="handleMouseMove"
@@ -51,8 +51,8 @@ export default {
   },
   computed: {
     itemStyle() {
-      const margin = this.isFocus ? '16px' : '8px';
-      const width = this.selected ? '95%' : (this.isFocus ? '93%' : '90%');
+      const margin = this.selected ? '14px' : (this.isFocus ? '22px' : '8px');
+      const width = this.selected ? '94%' : (this.isFocus ? '92%' : '90%');
       return { marginTop: margin, marginBottom: margin, width };
     },
     isFocus() {
@@ -68,7 +68,6 @@ export default {
 .side-bar-item
   margin 0 auto
   margin-left 10px
-  // width 95%
   margin-top 8px
   margin-bottom 8px
   cursor pointer

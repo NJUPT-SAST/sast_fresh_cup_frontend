@@ -10,5 +10,6 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
+  // store: mock,
   render: h => h(App),
 }).$mount('#app');
