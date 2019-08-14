@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import { login, userinfo } from '../api/index';
+
 export default {
   data: () => ({
     studentID: '',
@@ -55,9 +57,31 @@ export default {
     loginError: false,
   }),
   methods: {
-    handleLogin() {
+    async handleLogin() {
       /** 登录成功 => */
-      /** 登录失败 => */ this.loginError = true;
+      // /** 登录失败 => */ this.loginError = true;
+      const { ret } = await login(this.studentID, this.password);
+      if (ret === 200) {
+        const {
+          data: {
+            is_admin: isAdmin, ...rest
+          },
+        } = await userinfo();
+        this.$store.commit('handleUserinfo', {
+          ...rest, isAdmin,
+        });
+        setInterval(() => {
+          this.$store.dispatch('update');
+        }, 60000);
+        await this.$store.dispatch('init');
+        if (isAdmin) {
+          this.$router.push({ name: 'admin' });
+        } else {
+          this.$router.push({ name: 'answer' });
+        }
+      } else {
+        this.loginError = true;
+      }
     },
   },
 };
