@@ -22,7 +22,8 @@ module.exports = {
     'linebreak-style': 'off',
     'no-nested-ternary': 'off',
     'radix':'off',
-    'no-plusplus':'off'
+    'no-plusplus':'off',
+    'no-param-reassign':'off'
   },
   parserOptions: {
     parser: 'babel-eslint',
