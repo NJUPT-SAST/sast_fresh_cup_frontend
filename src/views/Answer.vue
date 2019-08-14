@@ -29,7 +29,7 @@
               <img
                 class="answer-content-card-img elevation-1"
                 v-for="(item,index) in questionList[selectedIndex].images"
-                :src="item"
+                :src="item.src"
                 :key="index"
                 alt=""
                 @click="newTab(item)"

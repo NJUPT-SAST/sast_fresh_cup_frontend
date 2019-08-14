@@ -6,7 +6,11 @@
       right
       top
       :timeout="3000"
-    >{{isSubmitSuccess? "修改成功！" : "修改失败，服务异常！"}}</v-snackbar>
+    >
+      <template v-if="snackbarType === 'modify'">{{ isSubmitSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
+      <template v-else-if="snackbarType === 'delete'">{{ isSubmitSuccess? "删除成功" : "删除失败，服务异常！" }}</template>
+      <template v-else-if="snackbarType === 'add'">{{ isSubmitSuccess? "添加成功" : "添加失败，服务异常" }}</template>
+    </v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
       scrollable
@@ -28,7 +32,7 @@
             :src="
               willDeleteIndex === -1
                 ? ''
-                : topicGroupsCopy[activeTab].images[willDeleteIndex].src"
+                : 'https://contestease.wyzwb.com'+topicGroups[activeTab].images[willDeleteIndex].url"
             class="grey darken-4"
           ></v-img>
         </v-card-text>
@@ -47,7 +51,7 @@
           {{
           willDeleteIndex === -1
           ? ''
-          : topicGroupsCopy[activeTab].attachments[willDeleteIndex].name
+          : topicGroups[activeTab].attachments[willDeleteIndex].name
           }}
         </v-card-text>
         <v-card-actions>
@@ -57,8 +61,17 @@
         </v-card-actions>
       </v-card>
       <v-card v-else-if="openDialogType === dialog.type[3]">
-        <v-card-title class="headline">确认删除此题？</v-card-title>
-        <v-card-text class="grey--text">此操作不可逆！</v-card-text>
+        <v-card-title>
+          <div class="headline">确认删除此题？</div>
+          <span class="grey--text">此操作不可逆！</span>
+        </v-card-title>
+        <v-card-text>
+          {{
+          willDeleteIndex === -1
+          ? ''
+          : 'QUESTION' + topicGroups[activeTab].id
+          }}
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error darken-1" flat @click="dialog.isOpen = false">取消</v-btn>
@@ -69,9 +82,9 @@
         <v-card-title>选项列表</v-card-title>
         <v-divider></v-divider>
         <v-card-text style="height: 300px;">
-          <template v-for="(option, index) in topicGroupsCopy[activeTab].options">
+          <template v-for="(option, index) in topicGroups[activeTab].options">
             <v-text-field
-              v-model="topicGroupsCopy[activeTab].options[index]"
+              v-model="topicGroups[activeTab].options[index]"
               :key="index"
               :disabled="!isEditing"
               placeholder="选项"
@@ -134,7 +147,7 @@
         <v-tabs v-model="activeTab" color="cyan" show-arrows grow>
           <v-tabs-slider color="yellow"></v-tabs-slider>
           <v-tab
-            v-for="(topic, index) in topicGroupsCopy"
+            v-for="(topic, index) in topicGroups"
             :key="index"
             :disabled="isEditing"
           >{{ 'QUESTION' + topic.id }}</v-tab>
@@ -142,15 +155,15 @@
       </template>
     </v-toolbar>
     <v-card class="loading-card" v-if="isGettingQuestions">
-      <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem" />
+      <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
       <span class="grey--text">努力加载中......</span>
     </v-card>
     <v-tabs-items v-model="activeTab" class="topic" v-show="isGetQuestionsSuccess">
-      <v-tab-item v-for="(topic, index) in topicGroupsCopy" :key="index" style="height: 100%">
+      <v-tab-item v-for="(topic, index) in topicGroups" :key="index" style="height: 100%">
         <v-card class="topic-card elevation-3">
           <div class="top-part">
             <v-card-title primary-title class="title-with-btn">
-              <div style="width: 70%">
+              <div style="width: 75%">
                 <v-text-field
                   class="headline"
                   height="45"
@@ -163,6 +176,7 @@
                 dark
                 style="margin-bottom: 1rem"
                 @click.stop="dialog.isOpen = true; openDialogType = 'options';"
+                v-if="topic.options.length"
               >{{isEditing? '修改选项' : '查看选项'}}</v-btn>
             </v-card-title>
             <v-card-text
@@ -187,6 +201,16 @@
                 <v-btn icon v-if="isEditing" @click="$refs.image.click()">
                   <v-icon>add_photo_alternate</v-icon>
                 </v-btn>
+                <v-btn
+                  icon
+                  v-if="isEditing"
+                  @click.stop="
+                      willDeleteIndex = index;
+                      dialog.isOpen = true;
+                      openDialogType = 'deleteImage'"
+                >
+                  <v-icon>broken_image</v-icon>
+                </v-btn>
               </v-card-title>
               <v-carousel
                 style="width: 100%; height: calc(100% - 48px)"
@@ -198,21 +222,9 @@
                 <v-carousel-item
                   v-for="(img, index) in topic.images"
                   :key="index"
-                  :src="img.src"
+                  :src="'https://contestease.wyzwb.com'+img.url"
                   style="height: 100%"
-                >
-                  <v-btn
-                    dark
-                    icon
-                    v-if="isEditing"
-                    @click.stop="
-                      willDeleteIndex = index;
-                      dialog.isOpen = true;
-                      openDialogType = 'deleteImage'"
-                  >
-                    <v-icon>broken_image</v-icon>
-                  </v-btn>
-                </v-carousel-item>
+                ></v-carousel-item>
               </v-carousel>
               <div class="no-file" v-else>
                 <div class="display-1">无</div>
@@ -265,14 +277,13 @@
 
 <script>
 import {
-  getQuestions, modifyQuestions, addSource, deleteSource,
+  modifyQuestions, deleteQuestions, addSource, deleteSource,
 } from '../api/index';
 
 export default {
   data: () => ({
     isSnackBarShow: false,
     isSubmitSuccess: false,
-    isSubmiting: false,
     isSearching: false,
     isEditing: false,
     isGettingQuestions: false,
@@ -282,92 +293,178 @@ export default {
       isOpen: false,
     },
     openDialogType: '',
-    // 题干是否变化
-    isContentChange: false,
-    // 图片或附件是否变化
-    isFileChange: false,
+    snackbarType: '',
+    // 目前选中的题目的选项卡，也是选中的题目的索引
     activeTab: null,
-    // 题目数组的拷贝，在获取题目时赋值，用于对比是否变化以调用不同接口,显示在页面上的是这个数组的内容
-    topicGroupsCopy: [],
-    // 获取题目后的题目数组
-    topicGroups: [],
     // 搜索的内容
     searchContent: '',
     // 即将删除的文件索引
     willDeleteIndex: -1,
   }),
+  computed: {
+    // 获取题目后的题目数组
+    topicGroups() {
+      return this.$store.state.questionArray;
+    },
+  },
   async mounted() {
     this.isGettingQuestions = true;
-    await getQuestions().then((res) => {
-      const { ret, data } = res;
-      if (ret === 200) {
-        this.isGettingQuestions = false;
-        this.isGetQuestionsSuccess = true;
-        this.topicGroupsCopy = data;
-        this.topicGroups = data;
-      } else {
-        this.isGetQuestionsSuccess = false;
-      }
+    await this.$store.dispatch('init').then((res) => {
+      this.isGettingQuestions = false;
+      this.isGetQuestionsSuccess = true;
     });
   },
   methods: {
-    handleEditClick() {
-      // 已经处于编辑状态时判断有无修改调用接口
+    async handleEditClick() {
+      // 已经处于编辑状态则提交修改
       if (this.isEditing) {
-        // 若有修改则调用接口，开启checkingDialog
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
-        setTimeout(() => {
+        const {
+          id, title, content, options,
+        } = this.topicGroups[this.activeTab];
+        await modifyQuestions(title, content, options, id).then((res) => {
+          this.$store.dispatch('update');
+          this.isEditing = false;
           this.dialog.isOpen = false;
-          this.isEditing = !this.isEditing;
-        }, 3000);
+          this.snackbarType = 'modify';
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        });
       } else {
         this.isEditing = !this.isEditing;
       }
     },
+    // 待完成
     handleSearchClick() {
       this.isSearching = !this.isSearching;
     },
-    handleDeleteTopic() {
-      this.dialog.isOpen = false;
+    async handleDeleteTopic() {
       // 调用删除接口，确认完成后再关闭checkingDialog
+      this.dialog.isOpen = false;
+      this.openDialogType = 'checking';
+      this.snackbarType = 'delete';
+      const { id } = this.topicGroups[this.activeTab];
+      await modifyQuestions(id).then((res) => {
+        this.dialog.isOpen = false;
+        this.isSnackBarShow = true;
+        const { ret, desc } = res;
+        if (ret === 200 && desc === 'successful') {
+          this.$store.dispatch('update');
+          this.isSubmitSuccess = true;
+        } else {
+          this.isSubmitSuccess = false;
+        }
+      }).catch((err) => {
+        this.dialog.isOpen = false;
+        this.isSnackBarShow = true;
+        this.isSubmitSuccess = false;
+      });
+    },
+    async handleAddAnnex(e) {
+      const { files } = e.target;
+      if (files.length !== 0) {
+        const file = files[0];
+        const { id } = this.topicGroups[this.activeTab];
+        this.dialog.isOpen = true;
+        this.openDialogType = 'checking';
+        this.snackbarType = 'add';
+        await addSource(id, 'attachment', file.name, file)
+          .then((res) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.$store.dispatch('update');
+              this.isSubmitSuccess = true;
+            } else {
+              this.isSubmitSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            this.isSubmitSuccess = false;
+          });
+      }
+    },
+    async handleDeleteAnnex() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      setTimeout(() => {
+      this.snackbarType = 'delete';
+      const { url } = this.topicGroups[this.activeTab].attachments[this.willDeleteIndex];
+      await deleteSource(url)
+        .then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBaeShow = true;
+          this.willDeleteIndex = -1;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.isSubmitSuccess = false;
+          this.willDeleteIndex = -1;
+        });
+    },
+    async handleAddImage(e) {
+      const { files } = e.target;
+      if (files.length !== 0) {
+        const { id } = this.topicGroups[this.activeTab];
+        const file = files[0];
+        this.dialog.isOpen = true;
+        this.openDialogType = 'checking';
+        this.snackbarType = 'add';
+        await addSource(id, 'image', file.name, file).then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        }).catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.isSubmitSuccess = false;
+        });
+      }
+    },
+    async handleDeleteImage() {
+      this.dialog.isOpen = true;
+      this.openDialogType = 'checking';
+      this.snackbarType = 'delete';
+      const { url } = this.topicGroups[this.activeTab].attachments[this.willDeleteIndex];
+      await deleteSource(url).then((res) => {
         this.dialog.isOpen = false;
-      }, 3000);
-    },
-    handleAddAnnex(e) {
-      const { files } = e.target;
-      if (files.length !== 0) {
-        const file = files[0];
-        this.topicGroupsCopy[this.activeTab].attachments.push({ name: file.name, file });
-      }
-    },
-    handleDeleteAnnex() {
-      this.topicGroupsCopy[this.activeTab].attachments.splice(this.willDeleteIndex, 1);
-      this.dialog.isOpen = false;
-      this.willDeleteIndex = -1;
-    },
-    handleAddImage(e) {
-      const { files } = e.target;
-      // 添加后在轮播图实现预览
-      if (files.length !== 0) {
-        const file = files[0];
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(file);
-        fileReader.onload = (ev) => {
-          const src = ev.target.result;
-          const newImage = { src, file };
-          this.topicGroupsCopy[this.activeTab].images.push(newImage);
-        };
-      }
-    },
-    handleDeleteImage() {
-      this.topicGroupsCopy[this.activeTab].images.splice(this.willDeleteIndex, 1);
-      this.dialog.isOpen = false;
-      // 重置
-      this.willDeleteIndex = -1;
+        this.isSnackBarShow = true;
+        this.willDeleteIndex = -1;
+        const { ret, desc } = res;
+        if (ret === 200 && desc === 'successful') {
+          this.$store.dispatch('update');
+          this.isSubmitSuccess = true;
+        } else {
+          this.isSubmitSuccess = false;
+        }
+      }).catch((err) => {
+        this.dialog.isOpen = false;
+        this.isSnackShow = true;
+        this.isSubmitSuccess = false;
+        this.willDeleteIndex = -1;
+      });
     },
   },
 };
