@@ -32,7 +32,7 @@
                 :src="baseURL + item.url"
                 :key="index"
                 :alt="item.name"
-                @click="newTab(item)"
+                @click="newTab(baseURL + item.url)"
               >
             </div>
             <div
