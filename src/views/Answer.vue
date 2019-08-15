@@ -29,9 +29,9 @@
               <img
                 class="answer-content-card-img elevation-1"
                 v-for="(item,index) in questionList[selectedIndex].images"
-                :src="item.src"
+                :src="baseURL + item.url"
                 :key="index"
-                alt=""
+                :alt="item.name"
                 @click="newTab(item)"
               >
             </div>
@@ -42,11 +42,11 @@
               <v-btn
                 v-for="(item,index) in questionList[selectedIndex].attachments"
                 :key="index"
-                @click="newTab(item.url)"
+                @click="newTab(baseURL+item.url)"
                 color="#90CAF9"
                 style="color:white"
               >
-                {{item.text}}
+                {{item.name}}
               </v-btn>
             </div>
           </v-card-text>
@@ -110,7 +110,7 @@
 import SideBarItem from '../components/SideBarItem';
 import FabGroup from '../components/FabGroup';
 import DebounceConstructor from '../utils/debounce.js';
-import { submit } from '../api/index.js';
+import { submit, baseURL } from '../api/index.js';
 
 export default {
   name: 'Answer',
@@ -166,6 +166,7 @@ export default {
       selectedIndex: 0,
       handleTyping,
       handleExecute,
+      baseURL,
     };
   },
   async mounted() {
