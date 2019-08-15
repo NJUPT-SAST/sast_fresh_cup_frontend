@@ -6,9 +6,14 @@
       right
       top
       :timeout="3000"
-    >{{isSubmitSuccess? "修改成功！" : "修改失败，服务异常！"}}</v-snackbar>
+    >
+      <template v-if="snackbarType === 'modify'">{{ isSubmitSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
+      <template v-else-if="snackbarType === 'delete'">{{ isSubmitSuccess? "删除成功" : "删除失败，服务异常！" }}</template>
+      <template v-else-if="snackbarType === 'add'">{{ isSubmitSuccess? "添加成功" : "添加失败，服务异常" }}</template>
+    </v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
+      scrollable
       persistent
       :width="openDialogType === dialog.type[1]? '50vw' : '300'"
     >
@@ -24,7 +29,10 @@
         </v-card-title>
         <v-card-text>
           <v-img
-            :src="willDeleteIndex === -1? '' : imageGroups[willDeleteIndex].src"
+            :src="
+              willDeleteIndex === -1
+                ? ''
+                : 'https://contestease.wyzwb.com'+topicGroups[activeTab].images[willDeleteIndex].url"
             class="grey darken-4"
           ></v-img>
         </v-card-text>
@@ -39,7 +47,13 @@
           <div class="headline">确认删除该附件？</div>
           <span class="grey--text">此操作不可逆！</span>
         </v-card-title>
-        <v-card-text>{{ willDeleteIndex === -1? '' : annexGroups[willDeleteIndex].name }}</v-card-text>
+        <v-card-text>
+          {{
+          willDeleteIndex === -1
+          ? ''
+          : topicGroups[activeTab].attachments[willDeleteIndex].name
+          }}
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error darken-1" flat @click="dialog.isOpen = false">取消</v-btn>
@@ -47,8 +61,17 @@
         </v-card-actions>
       </v-card>
       <v-card v-else-if="openDialogType === dialog.type[3]">
-        <v-card-title class="headline">确认删除此题？</v-card-title>
-        <v-card-text class="grey--text">此操作不可逆！</v-card-text>
+        <v-card-title>
+          <div class="headline">确认删除此题？</div>
+          <span class="grey--text">此操作不可逆！</span>
+        </v-card-title>
+        <v-card-text>
+          {{
+          willDeleteIndex === -1
+          ? ''
+          : 'QUESTION' + topicGroups[activeTab].id
+          }}
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error darken-1" flat @click="dialog.isOpen = false">取消</v-btn>
@@ -59,9 +82,9 @@
         <v-card-title>选项列表</v-card-title>
         <v-divider></v-divider>
         <v-card-text style="height: 300px;">
-          <template v-for="(option, index) in topicGroupsCopy[activeTab].options">
+          <template v-for="(option, index) in topicGroups[activeTab].options">
             <v-text-field
-              v-model="topicGroupsCopy[activeTab].options[index]"
+              v-model="topicGroups[activeTab].options[index]"
               :key="index"
               :disabled="!isEditing"
               placeholder="选项"
@@ -124,19 +147,23 @@
         <v-tabs v-model="activeTab" color="cyan" show-arrows grow>
           <v-tabs-slider color="yellow"></v-tabs-slider>
           <v-tab
-            v-for="(topic, index) in topicGroupsCopy"
+            v-for="(topic, index) in topicGroups"
             :key="index"
             :disabled="isEditing"
-          >{{ 'QUESTION' + topic.qid }}</v-tab>
+          >{{ 'QUESTION' + topic.id }}</v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
-    <v-tabs-items v-model="activeTab" class="topic">
-      <v-tab-item v-for="(topic, index) in topicGroupsCopy" :key="index" style="height: 100%">
+    <v-card class="loading-card" v-if="isGettingQuestions">
+      <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
+      <span class="grey--text">努力加载中......</span>
+    </v-card>
+    <v-tabs-items v-model="activeTab" class="topic" v-show="isGetQuestionsSuccess">
+      <v-tab-item v-for="(topic, index) in topicGroups" :key="index" style="height: 100%">
         <v-card class="topic-card elevation-3">
           <div class="top-part">
             <v-card-title primary-title class="title-with-btn">
-              <div style="width: 70%">
+              <div style="width: 75%">
                 <v-text-field
                   class="headline"
                   height="45"
@@ -148,7 +175,8 @@
               <v-btn
                 dark
                 style="margin-bottom: 1rem"
-                @click.stop="handleOptionClick"
+                @click.stop="dialog.isOpen = true; openDialogType = 'options';"
+                v-if="topic.options.length"
               >{{isEditing? '修改选项' : '查看选项'}}</v-btn>
             </v-card-title>
             <v-card-text
@@ -178,23 +206,23 @@
                 style="width: 100%; height: calc(100% - 48px)"
                 hide-delimiters
                 :cycle="false"
-                v-if="imageGroups.length !== 0"
+                v-if="topic.images.length !== 0"
                 height="100%"
               >
                 <v-carousel-item
-                  v-for="(img, index) in imageGroups"
+                  v-for="(img, index) in topic.images"
                   :key="index"
-                  :src="img.src"
+                  :src="'https://contestease.wyzwb.com'+img.url"
                   style="height: 100%"
                 >
                   <v-btn
-                    dark
-                    icon
+                    fab
+                    small
                     v-if="isEditing"
                     @click.stop="
-                      dialog.isOpen = true;
-                      willDeleteIndex = index;
-                      openDialogType = 'deleteImage'"
+                    willDeleteIndex = index;
+                    dialog.isOpen = true;
+                    openDialogType = 'deleteImage'"
                   >
                     <v-icon>broken_image</v-icon>
                   </v-btn>
@@ -214,10 +242,10 @@
               </v-card-title>
               <v-list
                 style="overflow-y: auto; height: calc(100% - 48px)"
-                v-if="annexGroups.length !== 0"
+                v-if="topic.attachments.length !== 0"
                 class="annex-show"
               >
-                <v-list-tile v-for="(annex, index) in annexGroups" :key="index" @click.stop>
+                <v-list-tile v-for="(annex, index) in topic.attachments" :key="index" @click.stop>
                   <v-list-tile-content>
                     <v-list-tile-title v-html="annex.name"></v-list-tile-title>
                   </v-list-tile-content>
@@ -250,149 +278,210 @@
 </template>
 
 <script>
+import {
+  modifyQuestions, deleteQuestions, addSource, deleteSource,
+} from '../api/index';
+
 export default {
   data: () => ({
     isSnackBarShow: false,
     isSubmitSuccess: false,
-    isSubmiting: false,
     isSearching: false,
     isEditing: false,
+    isGettingQuestions: false,
+    isGetQuestionsSuccess: false,
     dialog: {
       type: ['checking', 'deleteImage', 'deleteAnnex', 'deleteTopic', 'options'],
       isOpen: false,
     },
     openDialogType: '',
-    // 题干是否变化
-    isContentChange: false,
-    // 图片或附件是否变化
-    isFileChange: false,
+    snackbarType: '',
+    // 目前选中的题目的选项卡，也是选中的题目的索引
     activeTab: null,
-    // 题目数组的拷贝，在获取题目时赋值，用于对比是否变化以调用不同接口,显示在页面上的是这个数组的内容
-    topicGroupsCopy: [
-      {
-        qid: 1,
-        title: '题目一标题',
-        content:
-          '题目一内容，他很长很长很长很长很长很长很长很长很长很，长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长',
-        options: ['A', 'B', 'C', 'D'],
-        image: [],
-        annex: [],
-      },
-      {
-        qid: 2,
-        title: '题目二标题',
-        content: '题目二内容',
-        options: ['A', 'B', 'C', 'D'],
-        image: [],
-        annex: [],
-      },
-      {
-        qid: 3,
-        title: '题目三标题',
-        content: '题目三内容',
-        options: ['A', 'B', 'C', 'D'],
-        image: [],
-        annex: [],
-      },
-    ],
-    // 获取题目后的题目数组
-    topicGroups: [],
-    // 暂用，后面直接用题目的图片数组
-    imageGroups: [
-      {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg',
-      },
-    ],
-    // 同上
-    annexGroups: [
-      { name: '文件一' },
-      { name: '文件二' },
-      { name: '文件三' },
-      { name: '文件四' },
-      { name: '文件五' },
-      { name: '文件六' },
-    ],
     // 搜索的内容
     searchContent: '',
     // 即将删除的文件索引
     willDeleteIndex: -1,
   }),
+  computed: {
+    // 获取题目后的题目数组
+    topicGroups() {
+      return this.$store.state.questionArray;
+    },
+  },
+  async mounted() {
+    this.isGettingQuestions = true;
+    await this.$store.dispatch('update').then((res) => {
+      this.isGettingQuestions = false;
+      this.isGetQuestionsSuccess = true;
+    });
+  },
   methods: {
-    handleEditClick() {
-      // 已经处于编辑状态时判断有无修改调用接口
+    async handleEditClick() {
+      // 已经处于编辑状态则提交修改
       if (this.isEditing) {
-        // 若有修改则调用接口，开启checkingDialog
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
-        setTimeout(() => {
+        const {
+          id, title, content, options,
+        } = this.topicGroups[this.activeTab];
+        await modifyQuestions(title, content, options, id).then((res) => {
+          this.$store.dispatch('update');
+          this.isEditing = false;
           this.dialog.isOpen = false;
-          this.isEditing = !this.isEditing;
-        }, 3000);
+          this.snackbarType = 'modify';
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        });
       } else {
         this.isEditing = !this.isEditing;
       }
     },
+    // 待完成
     handleSearchClick() {
       this.isSearching = !this.isSearching;
     },
-    handleOptionClick() {
-      this.dialog.isOpen = true;
-      this.openDialogType = 'options';
-      console.log(this.topicGroupsCopy[this.activeTab]);
-    },
-    handleDeleteTopic() {
-      this.dialog.isOpen = false;
-      // 调用删除接口，确认完成后再关闭checkingDialog
+    async handleDeleteTopic() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      setTimeout(() => {
-        this.dialog.isOpen = false;
-      }, 3000);
+      this.snackbarType = 'delete';
+      const { id } = this.topicGroups[this.activeTab];
+      await deleteQuestions(id)
+        .then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.isSubmitSuccess = false;
+        });
     },
-    handleAddAnnex(e) {
+    async handleAddAnnex(e) {
       const { files } = e.target;
       if (files.length !== 0) {
         const file = files[0];
-        this.annexGroups.push({ name: file.name });
-        this.isFileChange = true;
+        const { id } = this.topicGroups[this.activeTab];
+        this.dialog.isOpen = true;
+        this.openDialogType = 'checking';
+        this.snackbarType = 'add';
+        const uploadFile = new FormData();
+        uploadFile.append('problem_id', id);
+        uploadFile.append('type', 'attachment');
+        uploadFile.append('name', file.name);
+        uploadFile.append('source', file);
+        await addSource(uploadFile)
+          .then((res) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.$store.dispatch('update');
+              this.isSubmitSuccess = true;
+            } else {
+              this.isSubmitSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            this.isSubmitSuccess = false;
+          });
       }
     },
-    handleDeleteAnnex() {
-      this.annexGroups.splice(this.willDeleteIndex, 1);
-      this.isFileChange = true;
-      this.dialog.isOpen = false;
-      this.willDeleteIndex = -1;
+    async handleDeleteAnnex() {
+      this.dialog.isOpen = true;
+      this.openDialogType = 'checking';
+      this.snackbarType = 'delete';
+      const { url } = this.topicGroups[this.activeTab].attachments[this.willDeleteIndex];
+      await deleteSource(url)
+        .then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBaeShow = true;
+          this.willDeleteIndex = -1;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.isSubmitSuccess = false;
+          this.willDeleteIndex = -1;
+        });
     },
-    handleAddImage(e) {
+    async handleAddImage(e) {
       const { files } = e.target;
-      // 添加后在轮播图实现预览
       if (files.length !== 0) {
+        const { id } = this.topicGroups[this.activeTab];
         const file = files[0];
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(file);
-        fileReader.onload = (ev) => {
-          const src = ev.target.result;
-          const newImage = { src };
-          this.imageGroups.push(newImage);
-        };
-        this.isFileChange = true;
+        this.dialog.isOpen = true;
+        this.openDialogType = 'checking';
+        this.snackbarType = 'add';
+        const uploadFile = new FormData();
+        uploadFile.append('problem_id', id);
+        uploadFile.append('type', 'image');
+        uploadFile.append('name', file.name);
+        uploadFile.append('source', file);
+        await addSource(uploadFile)
+          .then((res) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.$store.dispatch('update');
+              this.isSubmitSuccess = true;
+            } else {
+              this.isSubmitSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            this.isSubmitSuccess = false;
+          });
       }
     },
-    handleDeleteImage() {
-      this.imageGroups.splice(this.willDeleteIndex, 1);
-      this.isFileChange = true;
-      this.dialog.isOpen = false;
-      // 重置
-      this.willDeleteIndex = -1;
+    async handleDeleteImage() {
+      this.dialog.isOpen = true;
+      this.openDialogType = 'checking';
+      this.snackbarType = 'delete';
+      const { url } = this.topicGroups[this.activeTab].images[this.willDeleteIndex];
+      await deleteSource(url)
+        .then((res) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.willDeleteIndex = -1;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.isSubmitSuccess = true;
+          } else {
+            this.isSubmitSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackShow = true;
+          this.isSubmitSuccess = false;
+          this.willDeleteIndex = -1;
+        });
     },
   },
 };
@@ -405,6 +494,12 @@ export default {
   margin-top -1rem
   div
     background-size 100% 100%
+  .loading-card
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    height calc(100% - 112px)
   .topic
     height calc(100% - 112px)
     >div

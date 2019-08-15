@@ -21,9 +21,34 @@
       <v-icon dark>check</v-icon>
     </v-btn>
     <div class="headline">比赛时间设置</div>
+    <v-text-field
+      class="match-name"
+      v-model="matchName"
+      label="比赛名称"
+      prepend-icon="title"
+      style="width: 50%"
+    />
     <div class="time-picker-groups">
       <v-dialog
         ref="dialog1"
+        v-model="dateModal"
+        :return-value.sync="matchDate"
+        persistent
+        lazy
+        full-width
+        width="290px"
+      >
+        <template v-slot:activator="{ on }">
+          <v-text-field v-model="matchDate" label="比赛日期" prepend-icon="event" readonly v-on="on" />
+        </template>
+        <v-date-picker v-model="matchDate" scrollable color="primary">
+          <v-spacer></v-spacer>
+          <v-btn flat color="primary" @click="dateModal = false">Cancle</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog1.save(matchDate)">OK</v-btn>
+        </v-date-picker>
+      </v-dialog>
+      <v-dialog
+        ref="dialog2"
         v-model="startModal"
         :return-value.sync="startTime"
         persistent
@@ -43,11 +68,11 @@
         <v-time-picker v-if="startModal" v-model="startTime" format="24hr" full-width>
           <v-spacer></v-spacer>
           <v-btn flat color="primary" @click="startModal = false">取消</v-btn>
-          <v-btn flat color="primary" @click="$refs.dialog1.save(startTime)">确认</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog2.save(startTime)">确认</v-btn>
         </v-time-picker>
       </v-dialog>
       <v-dialog
-        ref="dialog2"
+        ref="dialog3"
         v-model="endModal"
         :return-value.sync="endTime"
         persistent
@@ -67,7 +92,7 @@
         <v-time-picker v-if="endModal" v-model="endTime" format="24hr" full-width>
           <v-spacer></v-spacer>
           <v-btn flat color="primary" @click="endModal = false">取消</v-btn>
-          <v-btn flat color="primary" @click="$refs.dialog2.save(endTime)">确认</v-btn>
+          <v-btn flat color="primary" @click="$refs.dialog3.save(endTime)">确认</v-btn>
         </v-time-picker>
       </v-dialog>
     </div>
@@ -80,32 +105,53 @@
 </template>
 
 <script>
+import { modifyDue } from '../api/index';
+
 export default {
   data: () => ({
     isSnackBarShow: false,
     isSetting: false,
     isSetSuccess: false,
+    dateModal: false,
     startModal: false,
     endModal: false,
     startTime: null,
     endTime: null,
+    matchDate: '',
   }),
+  computed: {
+    matchName() {
+      return this.$store.state.name;
+    },
+  },
   methods: {
-    handleSetting() {
-      /**
-       * 设置成功 => (效果)
-       * isSetSuccess后面换成后端返回的结果
-       * */
+    async handleSetting() {
       this.isSetting = true;
-      setTimeout(() => {
-        this.isSetting = false;
-        this.isSnackBarShow = true;
-        this.isSetSuccess = false; // true
-        this.startTime = null;
-        this.endTime = null;
-      }, 3000);
+      const startStr = `${this.matchDate} ${this.startTime}`;
+      const endStr = `${this.matchDate} ${this.endTime}`;
+      const startTimeStamp = Date.parse(new Date(startStr.replace(/-/g, '/'))) / 1000;
+      const endTimeStamp = Date.parse(new Date(endStr.replace(/-/g, '/'))) / 1000;
+      await modifyDue({ start: startTimeStamp, end: endTimeStamp, name: this.matchName })
+        .then((res) => {
+          this.isSetting = false;
+          this.isSnackBarShow = true;
+          const { ret, desc } = res;
+          if (ret === 200 && desc === 'successful') {
+            this.$store.dispatch('update');
+            this.handleReset();
+            this.isSetSuccess = true;
+          } else {
+            this.isSetSuccess = false;
+          }
+        })
+        .catch((err) => {
+          this.isSetting = false;
+          this.isSnackBarShow = true;
+          this.isSetSuccess = false;
+        });
     },
     handleReset() {
+      this.matchDate = '';
       this.startTime = null;
       this.endTime = null;
     },
@@ -116,8 +162,8 @@ export default {
 <style lang="stylus">
 .matchTime
   padding 3rem
-  width 90%
-  height auto
+  width 70%
+  height 470px
   .headline
     margin-bottom 2rem
   .time-picker-groups

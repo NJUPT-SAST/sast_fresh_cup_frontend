@@ -29,7 +29,7 @@
               <img
                 class="answer-content-card-img elevation-1"
                 v-for="(item,index) in questionList[selectedIndex].images"
-                :src="item"
+                :src="item.src"
                 :key="index"
                 alt=""
                 @click="newTab(item)"
@@ -189,11 +189,10 @@ export default {
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
 
-.v-label--active
-  font-size 23px
-
 .answer-container
   display flex
+  .v-label--active
+    font-size 23px
   .answer-sidebar-container
     padding-top 10px
     height calc(100vh - 80px)
