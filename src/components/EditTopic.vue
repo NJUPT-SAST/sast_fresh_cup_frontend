@@ -33,7 +33,7 @@
             :src="
               willDeleteIndex === -1
                 ? ''
-                : 'https://contestease.wyzwb.com'+topicGroups[activeTab].images[willDeleteIndex].url"
+                : baseURL +topicGroups[activeTab].images[willDeleteIndex].url"
             class="grey darken-4"
           ></v-img>
         </v-card-text>
@@ -246,12 +246,15 @@
                 :cycle="false"
                 v-if="topic.images.length !== 0"
                 height="100%"
+                :hide-controls="topic.images.length === 1"
               >
                 <v-carousel-item
                   v-for="(img, index) in topic.images"
                   :key="index"
-                  :src="'https://contestease.wyzwb.com'+img.url"
-                  style="height: 100%"
+                  :src="baseURL + img.url"
+                  :alt="img.name"
+                  @click="newTab(baseURL + img.url)"
+                  style="height: 100%; cursor: pointer"
                 >
                   <v-tooltip top>
                     <template v-slot:activator="{ on }">
@@ -294,7 +297,11 @@
                 v-if="topic.attachments.length !== 0"
                 class="annex-show"
               >
-                <v-list-tile v-for="(annex, index) in topic.attachments" :key="index" @click.stop>
+                <v-list-tile
+                  v-for="(annex, index) in topic.attachments"
+                  :key="index"
+                  @click="newTab(baseURL + annex.url)"
+                >
                   <v-list-tile-content>
                     <v-list-tile-title v-html="annex.name"></v-list-tile-title>
                   </v-list-tile-content>
@@ -334,7 +341,7 @@
 
 <script>
 import {
-  modifyQuestions, deleteQuestions, addSource, deleteSource,
+  modifyQuestions, deleteQuestions, addSource, deleteSource, baseURL,
 } from '../api/index';
 
 export default {
@@ -357,6 +364,7 @@ export default {
     searchContent: '',
     // 即将删除的文件索引
     willDeleteIndex: -1,
+    baseURL,
   }),
   computed: {
     // 获取题目后的题目数组
@@ -366,15 +374,21 @@ export default {
   },
   async mounted() {
     this.isGettingQuestions = true;
-    await this.$store.dispatch('update').then((res) => {
-      this.isGettingQuestions = false;
-      this.isGetQuestionsSuccess = true;
-    }).catch((err) => {
-      this.isGettingQuestions = false;
-      this.isGetQuestionsSuccess = false;
-    });
+    await this.$store
+      .dispatch('update')
+      .then((res) => {
+        this.isGettingQuestions = false;
+        this.isGetQuestionsSuccess = true;
+      })
+      .catch((err) => {
+        this.isGettingQuestions = false;
+        this.isGetQuestionsSuccess = false;
+      });
   },
   methods: {
+    newTab(target) {
+      window.open(target, '_blank');
+    },
     async handleEditClick() {
       // 已经处于编辑状态则提交修改
       if (this.isEditing) {

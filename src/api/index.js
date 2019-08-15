@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'https://contestease.wyzwb.com'; // 开发环境地址
+export const baseURL = 'https://contestease.wyzwb.com'; // 开发环境地址
 const clientSecret = 'lDCcVZDe8aPgBKK2Z3FfUXUMDHLXBj49GVB4ArkA';
 
 let instance = axios.create({
