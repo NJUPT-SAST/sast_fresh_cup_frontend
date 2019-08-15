@@ -102,7 +102,7 @@ const actions = {
       });
     }
 
-    commit('handleUpdate', newState);
+    await commit('handleUpdate', newState);
   },
   async init({ dispatch, commit }) {
     await dispatch('update');

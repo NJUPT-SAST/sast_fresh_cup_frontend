@@ -14,7 +14,12 @@
       />
     </div>
     <div class="answer-content">
-      <fab-group />
+      <fab-group
+        :isUpDisabled="selectedIndex === 0"
+        :isDownDisabled="selectedIndex === questionList.length-1"
+        @handleUp="handleQuestionSwitch(true)"
+        @handleDown="handleQuestionSwitch(false)"
+      />
       <div ref="content">
         <v-card class="answer-content-card">
           <v-card-title class="answer-content-card-title">
@@ -83,7 +88,7 @@
           </v-card-actions>
         </v-card>
       </div>
-      <div class="answer-content-btn-container">
+      <!-- <div class="answer-content-btn-container">
         <v-btn
           :disabled="selectedIndex === 0"
           @click="handleQuestionSwitch(true)"
@@ -98,12 +103,13 @@
           large
           color="#CFD8DC"
         >下一题</v-btn>
-      </div>
+      </div> -->
     </div>
   </div>
-  <div v-else>
-    此处显示一个正在加载
-  </div>
+  <v-card v-else class="loading-card" height="100%" width="100vw">
+    <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
+    <span class="grey--text">努力加载中......</span>
+  </v-card>
 </template>
 
 <script>
@@ -151,7 +157,6 @@ export default {
   },
   computed: {
     questionList() {
-      console.log(this.$store.state.questionArray);
       return this.$store.state.questionArray;
     },
   },
@@ -170,8 +175,10 @@ export default {
     };
   },
   async mounted() {
-    await this.$store.dispatch('init');
-    console.log(this.questionList);
+    const { questionList, selectedIndex } = this;
+    if (!questionList.length || questionList[selectedIndex].answer === undefined) {
+      await this.$store.dispatch('init');
+    }
   },
 };
 </script>
@@ -189,6 +196,12 @@ export default {
   background: #bbb;
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
+
+.loading-card
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
 
 .answer-container
   display flex
