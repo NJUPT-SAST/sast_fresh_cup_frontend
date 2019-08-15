@@ -108,9 +108,9 @@ const actions = {
     await dispatch('update');
     const tempQuestionArray = this.state.questionArray;
     const { data: submitted } = await getSubmitted();
-    const newQuestionArray = injectAnswer(tempQuestionArray, submitted);
-    commit('injectCommitted', newQuestionArray);
-    commit('handleSubmittedInit', submitted);
+    const newQuestionArray = await injectAnswer(tempQuestionArray, submitted);
+    await commit('injectCommitted', newQuestionArray);
+    await commit('handleSubmittedInit', submitted);
   },
 };
 
