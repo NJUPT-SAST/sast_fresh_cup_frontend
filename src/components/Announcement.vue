@@ -6,11 +6,7 @@
       :right="true"
       :top="true"
       :timeout="3000"
-    >
-      <template v-if="snackbarType === 'release'">{{isSuccess? "发布成功！" : "发布失败，服务异常！"}}</template>
-      <template v-else-if="snackbarType === 'modify'">{{isSuccess? "修改成功！" : "修改失败，服务异常！"}}</template>
-      <template v-else-if="snackbarType === 'delete'">{{isSuccess? "删除成功！" : "删除失败，服务异常！"}}</template>
-    </v-snackbar>
+    >{{isSuccess? successMsg : errMsg}}</v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
       persistent
@@ -36,9 +32,10 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-btn color="success darken-1" flat @click="handleModify">确认修改</v-btn>
           <v-btn color="error darken-1" flat @click="openDialogType = 'delete'">删除</v-btn>
-          <v-btn color="blue darken-1" flat @click="handleModify">确认修改</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click="dialog.isOpen = false">关闭</v-btn>
         </v-card-actions>
       </v-card>
       <v-card v-if="openDialogType === dialog.type[1]">
@@ -162,7 +159,6 @@ export default {
       type: ['edit', 'add', 'delete', 'checking'],
     },
     openDialogType: '',
-    snackbarType: '',
     nowPage: 1,
     startIndex: 0,
     endIndex: 3,
@@ -171,6 +167,8 @@ export default {
       title: '',
       content: '',
     },
+    successMsg: '',
+    errMsg: '',
   }),
   computed: {
     noticeList() {
@@ -208,7 +206,6 @@ export default {
     async handleRelease() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'release';
       const { title, content } = this.addNotice;
       await modifyNotice(title, content)
         .then((res) => {
@@ -218,12 +215,14 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.isSuccess = true;
+            this.successMsg = '发布成功！';
             this.$store.dispatch('update');
             this.addNotice = {
               title: '',
               content: '',
             };
           } else {
+            this.errMsg = '发布失败，服务异常！';
             this.isSuccess = false;
           }
         })
@@ -231,12 +230,12 @@ export default {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
           this.isSuccess = false;
+          this.errMsg = '发布失败，服务异常！';
         });
     },
     async handleModify() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'modify';
       const { id, title, content } = this.noticeList[this.commandIndex];
       await modifyNotice(title, content, id)
         .then((res) => {
@@ -245,21 +244,23 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.isSuccess = true;
+            this.successMsg = '修改成功！';
             this.$store.dispatch('update');
           } else {
             this.isSuccess = false;
+            this.errMsg = '修改失败，服务异常！';
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
           this.isSuccess = false;
+          this.errMsg = '修改失败，服务异常！';
         });
     },
     async handleDelete() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'delete';
       const { id } = this.noticeList[this.commandIndex];
       await deleteNotice(id)
         .then((res) => {
@@ -268,15 +269,18 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.isSuccess = true;
+            this.successMsg = '删除成功';
             this.$store.dispatch('update');
           } else {
             this.isSuccess = false;
+            this.errMsg = '删除失败，服务异常！';
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
           this.isSuccess = false;
+          this.errMsg = '删除失败，服务异常！';
         });
     },
   },

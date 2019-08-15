@@ -7,10 +7,7 @@
       top
       :timeout="3000"
     >
-      <template v-if="snackbarType === 'modify'">{{ isSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
-      <template v-else-if="snackbarType === 'delete'">{{ isSuccess? "删除成功" : "删除失败，服务异常！" }}</template>
-      <template v-else-if="snackbarType === 'add'">{{ isSuccess? "添加成功" : "添加失败，服务异常" }}</template>
-      <template v-else-if="snackbarType === 'search'">未找到ID，请检查输入是否正确！</template>
+      {{isSuccess? successMsg : errMsg}}
     </v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
@@ -357,7 +354,6 @@ export default {
       isOpen: false,
     },
     openDialogType: '',
-    snackbarType: '',
     // 目前选中的题目的选项卡，也是选中的题目的索引
     activeTab: null,
     // 搜索的内容
@@ -365,6 +361,8 @@ export default {
     // 即将删除的文件索引
     willDeleteIndex: -1,
     baseURL,
+    successMsg: '',
+    errMsg: '',
   }),
   computed: {
     // 获取题目后的题目数组
@@ -401,14 +399,20 @@ export default {
           this.$store.dispatch('update');
           this.isEditing = false;
           this.dialog.isOpen = false;
-          this.snackbarType = 'modify';
           this.isSnackBarShow = true;
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.isSuccess = true;
+            this.successMsg = '修改成功！';
           } else {
+            this.errMsg = '修改失败，服务异常！';
             this.isSuccess = false;
           }
+        }).catch((err) => {
+          this.dialog.isOpen = false;
+          this.isSnackBarShow = true;
+          this.isSuccess = false;
+          this.errMsg = '修改失败，服务异常！';
         });
       } else {
         this.isEditing = !this.isEditing;
@@ -423,8 +427,8 @@ export default {
       );
       if (searchIndex === -1) {
         this.isSnackBarShow = true;
-        this.snackbarType = 'search';
         this.isSuccess = false;
+        this.errMsg = '未找到ID，请检查输入是否正确！';
       } else {
         this.activeTab = searchIndex;
         this.searchContent = '';
@@ -437,7 +441,6 @@ export default {
     async handleDeleteTopic() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'delete';
       const { id } = this.topicGroups[this.activeTab];
       await deleteQuestions(id)
         .then((res) => {
@@ -447,14 +450,17 @@ export default {
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
             this.isSuccess = true;
+            this.successMsg = '删除成功！';
           } else {
             this.isSuccess = false;
+            this.errMsg = '删除失败，服务异常！';
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
           this.isSuccess = false;
+          this.errMsg = '删除失败，服务异常！';
         });
     },
     async handleAddAnnex(e) {
@@ -464,7 +470,6 @@ export default {
         const { id } = this.topicGroups[this.activeTab];
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
-        this.snackbarType = 'add';
         const uploadFile = new FormData();
         uploadFile.append('problem_id', id);
         uploadFile.append('type', 'attachment');
@@ -478,7 +483,9 @@ export default {
             if (ret === 200 && desc === 'successful') {
               this.$store.dispatch('update');
               this.isSuccess = true;
+              this.successMsg = '添加成功！';
             } else {
+              this.errMsg = '添加失败，服务异常！';
               this.isSuccess = false;
             }
           })
@@ -486,31 +493,34 @@ export default {
             this.dialog.isOpen = false;
             this.isSnackBarShow = true;
             this.isSuccess = false;
+            this.errMsg = '添加失败，服务异常！';
           });
       }
     },
     async handleDeleteAnnex() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'delete';
       const { url } = this.topicGroups[this.activeTab].attachments[this.willDeleteIndex];
       await deleteSource(url)
         .then((res) => {
           this.dialog.isOpen = false;
-          this.isSnackBaeShow = true;
+          this.isSnackBarShow = true;
           this.willDeleteIndex = -1;
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
             this.isSuccess = true;
+            this.successMsg = '删除成功！';
           } else {
             this.isSuccess = false;
+            this.errMsg = '删除失败，服务异常！';
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
           this.isSuccess = false;
+          this.errMsg = '删除失败，服务异常！';
           this.willDeleteIndex = -1;
         });
     },
@@ -521,7 +531,6 @@ export default {
         const file = files[0];
         this.dialog.isOpen = true;
         this.openDialogType = 'checking';
-        this.snackbarType = 'add';
         const uploadFile = new FormData();
         uploadFile.append('problem_id', id);
         uploadFile.append('type', 'image');
@@ -535,21 +544,23 @@ export default {
             if (ret === 200 && desc === 'successful') {
               this.$store.dispatch('update');
               this.isSuccess = true;
+              this.successMsg = '添加成功！';
             } else {
               this.isSuccess = false;
+              this.errMsg = '添加失败，服务异常！';
             }
           })
           .catch((err) => {
             this.dialog.isOpen = false;
             this.isSnackBarShow = true;
             this.isSuccess = false;
+            this.errMsg = '添加失败，服务异常！';
           });
       }
     },
     async handleDeleteImage() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
-      this.snackbarType = 'delete';
       const { url } = this.topicGroups[this.activeTab].images[this.willDeleteIndex];
       await deleteSource(url)
         .then((res) => {
@@ -560,14 +571,17 @@ export default {
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
             this.isSuccess = true;
+            this.successMsg = '删除成功！';
           } else {
             this.isSuccess = false;
+            this.errMsg = '删除失败，服务异常！';
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackShow = true;
           this.isSuccess = false;
+          this.errMsg = '删除失败，服务异常！';
           this.willDeleteIndex = -1;
         });
     },
