@@ -94,7 +94,22 @@
         <span>点击添加</span>
       </v-tooltip>
     </v-toolbar>
-    <v-card class="notice-container blue-grey lighten-4">
+    <v-card class="loading-card" v-if="isGettingNotice" height="calc(100% - 54px)">
+      <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
+      <span class="grey--text">努力加载中......</span>
+    </v-card>
+    <v-card
+      class="loading-card"
+      v-show="!isGetNoticeSuccess && !isGettingNotice"
+      height="calc(100% - 54px)"
+    >
+      <v-icon x-large style="margin-bottom: 2rem" color="error">error</v-icon>
+      <span class="grey--text">加载失败，请刷新页面重试！</span>
+    </v-card>
+    <v-card
+      class="notice-container blue-grey lighten-4"
+      v-show="isGetNoticeSuccess && !isGettingNotice"
+    >
       <div class="notice-groups">
         <template v-for="(notice, index) in noticeList">
           <v-card
@@ -122,7 +137,12 @@
         </template>
       </div>
       <div class="page-controller">
-        <v-pagination v-model="nowPage" :length="pageNum" :total-visible="7" @input="handleNowPage"></v-pagination>
+        <v-pagination
+          v-model="nowPage"
+          :length="pageNum"
+          :total-visible="7"
+          @input="handleNowPage"
+        />
       </div>
     </v-card>
   </div>
@@ -135,6 +155,8 @@ export default {
   data: () => ({
     isSnackBarShow: false,
     isSuccess: false,
+    isGettingNotice: false,
+    isGetNoticeSuccess: false,
     dialog: {
       isOpen: false,
       type: ['edit', 'add', 'delete', 'checking'],
@@ -159,6 +181,19 @@ export default {
         ? parseInt(this.$store.state.noticeArray.length / 4)
         : parseInt(this.$store.state.noticeArray.length / 4 + 1);
     },
+  },
+  async mounted() {
+    this.isGettingNotice = true;
+    await this.$store
+      .dispatch('update')
+      .then((res) => {
+        this.isGettingNotice = false;
+        this.isGetNoticeSuccess = true;
+      })
+      .catch((err) => {
+        this.isGettingNotice = false;
+        this.isGetNoticeSuccess = false;
+      });
   },
   methods: {
     handleNowPage() {
@@ -252,6 +287,8 @@ export default {
 .announcement
   width 90%
   height 600px
+  // .loading-card
+  // height calc(100% - 54px)
   .notice-container
     height calc(100% - 54px)
     padding 3rem
@@ -262,10 +299,11 @@ export default {
       height calc(100% - 3rem - 4rem)
       display flex
       flex-direction row
-      justify-content space-between
+      justify-content space-around
       .notice-item
         width 20%
         height 100%
+        // margin 0 2rem
         .notice-title
           height 52px
           padding 0

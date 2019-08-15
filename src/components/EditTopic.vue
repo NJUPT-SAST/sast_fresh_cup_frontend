@@ -175,11 +175,23 @@
         </v-tabs>
       </template>
     </v-toolbar>
-    <v-card class="loading-card" v-if="isGettingQuestions">
+    <v-card class="loading-card" v-if="isGettingQuestions" height="calc(100% - 112px)">
       <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
       <span class="grey--text">努力加载中......</span>
     </v-card>
-    <v-tabs-items v-model="activeTab" class="topic" v-show="isGetQuestionsSuccess">
+    <v-card
+      class="loading-card"
+      v-show="!isGetQuestionsSuccess && !isGettingQuestions"
+      height="calc(100% - 112px)"
+    >
+      <v-icon x-large style="margin-bottom: 2rem" color="error">error</v-icon>
+      <span class="grey--text">加载失败，请刷新页面重试！</span>
+    </v-card>
+    <v-tabs-items
+      v-model="activeTab"
+      class="topic"
+      v-show="isGetQuestionsSuccess && !isGettingQuestions"
+    >
       <v-tab-item v-for="(topic, index) in topicGroups" :key="index" style="height: 100%">
         <v-card class="topic-card elevation-3">
           <div class="top-part">
@@ -357,6 +369,9 @@ export default {
     await this.$store.dispatch('update').then((res) => {
       this.isGettingQuestions = false;
       this.isGetQuestionsSuccess = true;
+    }).catch((err) => {
+      this.isGettingQuestions = false;
+      this.isGetQuestionsSuccess = false;
     });
   },
   methods: {
@@ -553,12 +568,6 @@ export default {
   margin-top -1rem
   div
     background-size 100% 100%
-  .loading-card
-    display flex
-    flex-direction column
-    justify-content center
-    align-items center
-    height calc(100% - 112px)
   .topic
     height calc(100% - 112px)
     >div
