@@ -12,7 +12,7 @@
             <v-icon>today</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title style="letter-spacing: 2px">公告编辑</v-list-tile-title>
+            <v-list-tile-title style="letter-spacing: 2px">公告板</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-divider></v-divider>
