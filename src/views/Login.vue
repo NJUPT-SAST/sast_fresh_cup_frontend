@@ -38,7 +38,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" @click="handleLogin">登录</v-btn>
+              <v-btn color="primary" @click="handleLogin" :loading="btnLoading">登录</v-btn>
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -55,11 +55,13 @@ export default {
     studentID: '',
     password: '',
     loginError: false,
+    btnLoading: false,
   }),
   methods: {
     async handleLogin() {
       /** 登录成功 => */
       // /** 登录失败 => */ this.loginError = true;
+      this.btnLoading = true;
       const { ret } = await login(this.studentID, this.password);
       if (ret === 200) {
         const {
@@ -74,6 +76,7 @@ export default {
           this.$store.dispatch('update');
         }, 10000);
         await this.$store.dispatch('init');
+        this.btnLoading = false;
         if (isAdmin) {
           this.$router.push({ name: 'admin' });
         } else {
