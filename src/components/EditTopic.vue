@@ -2,14 +2,17 @@
   <div class="editTopic elevation-3">
     <v-snackbar
       v-model="isSnackBarShow"
-      :color="isSubmitSuccess? 'success' : 'error'"
+      :color="isSuccess? 'success' : 'error'"
       right
       top
       :timeout="3000"
     >
-      <template v-if="snackbarType === 'modify'">{{ isSubmitSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
-      <template v-else-if="snackbarType === 'delete'">{{ isSubmitSuccess? "删除成功" : "删除失败，服务异常！" }}</template>
-      <template v-else-if="snackbarType === 'add'">{{ isSubmitSuccess? "添加成功" : "添加失败，服务异常" }}</template>
+      <template v-if="snackbarType === 'modify'">{{ isSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
+      <template v-else-if="snackbarType === 'delete'">
+        {{ isSuccess? "删除成功" : "删除失败，服务异常！" }}
+      </template>
+      <template v-else-if="snackbarType === 'add'">{{ isSuccess? "添加成功" : "添加失败，服务异常" }}</template>
+      <template v-else-if="snackbarType === 'search'">未找到ID，请检查输入是否正确！</template>
     </v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
@@ -93,9 +96,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn flat color="primary" @click="addOption" v-if="isEditing">
-            添加选项
-          </v-btn>
+          <v-btn flat color="primary" @click="addOption" v-if="isEditing">添加选项</v-btn>
           <v-spacer/>
           <v-btn
             color="blue darken-1"
@@ -127,10 +128,13 @@
       <v-toolbar-title v-if="!isSearching">题目编辑</v-toolbar-title>
       <v-text-field
         v-else-if="isSearching"
+        append-outer-icon="send"
         flat
-        placeholder="题目ID或标题"
+        placeholder="题目ID"
         solo-inverted
         style="margin-top: 10px"
+        @click:append-outer="handleSearch"
+        v-model="searchContent"
       ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn icon @click="handleEditClick">
@@ -288,7 +292,7 @@ import {
 export default {
   data: () => ({
     isSnackBarShow: false,
-    isSubmitSuccess: false,
+    isSuccess: false,
     isSearching: false,
     isEditing: false,
     isGettingQuestions: false,
@@ -336,18 +340,31 @@ export default {
           this.isSnackBarShow = true;
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
-            this.isSubmitSuccess = true;
+            this.isSuccess = true;
           } else {
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           }
         });
       } else {
         this.isEditing = !this.isEditing;
       }
     },
-    // 待完成
     handleSearchClick() {
       this.isSearching = !this.isSearching;
+    },
+    handleSearch() {
+      const searchIndex = this.topicGroups.findIndex(
+        item => item.id === Number(this.searchContent),
+      );
+      if (searchIndex === -1) {
+        this.isSnackBarShow = true;
+        this.snackbarType = 'search';
+        this.isSuccess = false;
+      } else {
+        this.activeTab = searchIndex;
+        this.searchContent = '';
+        this.isSearching = false;
+      }
     },
     addOption() {
       this.topicGroups[this.activeTab].options.push('');
@@ -364,15 +381,15 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
-            this.isSubmitSuccess = true;
+            this.isSuccess = true;
           } else {
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
-          this.isSubmitSuccess = false;
+          this.isSuccess = false;
         });
     },
     async handleAddAnnex(e) {
@@ -395,15 +412,15 @@ export default {
             const { ret, desc } = res;
             if (ret === 200 && desc === 'successful') {
               this.$store.dispatch('update');
-              this.isSubmitSuccess = true;
+              this.isSuccess = true;
             } else {
-              this.isSubmitSuccess = false;
+              this.isSuccess = false;
             }
           })
           .catch((err) => {
             this.dialog.isOpen = false;
             this.isSnackBarShow = true;
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           });
       }
     },
@@ -420,15 +437,15 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
-            this.isSubmitSuccess = true;
+            this.isSuccess = true;
           } else {
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackBarShow = true;
-          this.isSubmitSuccess = false;
+          this.isSuccess = false;
           this.willDeleteIndex = -1;
         });
     },
@@ -452,15 +469,15 @@ export default {
             const { ret, desc } = res;
             if (ret === 200 && desc === 'successful') {
               this.$store.dispatch('update');
-              this.isSubmitSuccess = true;
+              this.isSuccess = true;
             } else {
-              this.isSubmitSuccess = false;
+              this.isSuccess = false;
             }
           })
           .catch((err) => {
             this.dialog.isOpen = false;
             this.isSnackBarShow = true;
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           });
       }
     },
@@ -477,15 +494,15 @@ export default {
           const { ret, desc } = res;
           if (ret === 200 && desc === 'successful') {
             this.$store.dispatch('update');
-            this.isSubmitSuccess = true;
+            this.isSuccess = true;
           } else {
-            this.isSubmitSuccess = false;
+            this.isSuccess = false;
           }
         })
         .catch((err) => {
           this.dialog.isOpen = false;
           this.isSnackShow = true;
-          this.isSubmitSuccess = false;
+          this.isSuccess = false;
           this.willDeleteIndex = -1;
         });
     },
