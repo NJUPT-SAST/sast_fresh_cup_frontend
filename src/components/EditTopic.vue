@@ -93,6 +93,9 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
+          <v-btn flat color="primary" @click="addOption" v-if="isEditing">
+            添加选项
+          </v-btn>
           <v-spacer/>
           <v-btn
             color="blue darken-1"
@@ -346,6 +349,9 @@ export default {
     handleSearchClick() {
       this.isSearching = !this.isSearching;
     },
+    addOption() {
+      this.topicGroups[this.activeTab].options.push('');
+    },
     async handleDeleteTopic() {
       this.dialog.isOpen = true;
       this.openDialogType = 'checking';
@@ -523,7 +529,7 @@ export default {
           height 100%
           width 100%
           textarea
-            height 20vh
+            height 150px
         .topic-content
           height 70%
           overflow-y auto
