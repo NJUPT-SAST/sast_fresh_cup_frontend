@@ -8,9 +8,7 @@
       :timeout="3000"
     >
       <template v-if="snackbarType === 'modify'">{{ isSuccess? "修改成功！" : "修改失败，服务异常！" }}</template>
-      <template v-else-if="snackbarType === 'delete'">
-        {{ isSuccess? "删除成功" : "删除失败，服务异常！" }}
-      </template>
+      <template v-else-if="snackbarType === 'delete'">{{ isSuccess? "删除成功" : "删除失败，服务异常！" }}</template>
       <template v-else-if="snackbarType === 'add'">{{ isSuccess? "添加成功" : "添加失败，服务异常" }}</template>
       <template v-else-if="snackbarType === 'search'">未找到ID，请检查输入是否正确！</template>
     </v-snackbar>
@@ -122,12 +120,17 @@
       style="width: 0; height: 0; display: none"
     >
     <v-toolbar color="cyan" dark tabs height="64px">
-      <v-btn icon @click="handleSearchClick">
-        <v-icon>search</v-icon>
-      </v-btn>
-      <v-toolbar-title v-if="!isSearching">题目编辑</v-toolbar-title>
+      <v-tooltip right>
+        <template v-slot:activator="{ on }">
+          <v-btn icon @click="handleSearchClick" v-on="on" v-if="!isEditing">
+            <v-icon>search</v-icon>
+          </v-btn>
+        </template>
+        <span>搜索题目ID</span>
+      </v-tooltip>
+      <v-toolbar-title v-if="!isSearching || isEditing">题目编辑</v-toolbar-title>
       <v-text-field
-        v-else-if="isSearching"
+        v-else-if="isSearching && !isEditing"
         append-outer-icon="send"
         flat
         placeholder="题目ID"
@@ -137,19 +140,30 @@
         v-model="searchContent"
       ></v-text-field>
       <v-spacer></v-spacer>
-      <v-btn icon @click="handleEditClick">
-        <v-icon>{{isEditing? 'check' : 'edit'}}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        v-show="!isEditing"
-        @click.stop="
+      <v-tooltip left>
+        <template v-slot:activator="{ on }">
+          <v-btn icon @click="handleEditClick" v-on="on">
+            <v-icon>{{isEditing? 'check' : 'edit'}}</v-icon>
+          </v-btn>
+        </template>
+        <span>{{isEditing? '提交修改' : '编辑题目'}}</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <template v-slot:activator="{ on }">
+          <v-btn
+            v-on="on"
+            icon
+            v-show="!isEditing"
+            @click.stop="
           dialog.isOpen = true;
           willDeleteIndex = activeTab;
           openDialogType = 'deleteTopic'"
-      >
-        <v-icon>delete</v-icon>
-      </v-btn>
+          >
+            <v-icon>delete</v-icon>
+          </v-btn>
+        </template>
+        <span>删除题目</span>
+      </v-tooltip>
       <template v-slot:extension>
         <v-tabs v-model="activeTab" color="cyan" show-arrows grow>
           <v-tabs-slider color="yellow"></v-tabs-slider>
@@ -205,9 +219,14 @@
               <v-card-title style="padding: 0; padding-left: 1rem; height: 48px">
                 <div class="title white--text">图片</div>
                 <v-spacer/>
-                <v-btn icon v-if="isEditing" @click="$refs.image.click()">
-                  <v-icon>add_photo_alternate</v-icon>
-                </v-btn>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-if="isEditing" @click="$refs.image.click()" v-on="on">
+                      <v-icon>add_photo_alternate</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>添加图片</span>
+                </v-tooltip>
               </v-card-title>
               <v-carousel
                 style="width: 100%; height: calc(100% - 48px)"
@@ -222,17 +241,23 @@
                   :src="'https://contestease.wyzwb.com'+img.url"
                   style="height: 100%"
                 >
-                  <v-btn
-                    fab
-                    small
-                    v-if="isEditing"
-                    @click.stop="
-                    willDeleteIndex = index;
-                    dialog.isOpen = true;
-                    openDialogType = 'deleteImage'"
-                  >
-                    <v-icon>broken_image</v-icon>
-                  </v-btn>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                        fab
+                        small
+                        v-on="on"
+                        v-if="isEditing"
+                        @click.stop="
+                          willDeleteIndex = index;
+                          dialog.isOpen = true;
+                          openDialogType = 'deleteImage'"
+                      >
+                        <v-icon>broken_image</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>删除图片</span>
+                  </v-tooltip>
                 </v-carousel-item>
               </v-carousel>
               <div class="no-file" v-else>
@@ -243,9 +268,14 @@
               <v-card-title style="padding: 0; margin-left: 1rem; height: 48px">
                 <div class="title white--text">附件</div>
                 <v-spacer/>
-                <v-btn icon v-if="isEditing" @click="$refs.annex.click()">
-                  <v-icon>note_add</v-icon>
-                </v-btn>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-if="isEditing" @click="$refs.annex.click()" v-on="on">
+                      <v-icon>note_add</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>添加附件</span>
+                </v-tooltip>
               </v-card-title>
               <v-list
                 style="overflow-y: auto; height: calc(100% - 48px)"
@@ -257,19 +287,25 @@
                     <v-list-tile-title v-html="annex.name"></v-list-tile-title>
                   </v-list-tile-content>
                   <v-list-tile-action>
-                    <v-btn
-                      fab
-                      ripple
-                      icon
-                      style="width: 30px; height: 30px;"
-                      v-if="isEditing"
-                      @click.stop="
-                        dialog.isOpen = true;
-                        willDeleteIndex = index;
-                        openDialogType = 'deleteAnnex'"
-                    >
-                      <v-icon dark>clear</v-icon>
-                    </v-btn>
+                    <v-tooltip right>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          fab
+                          ripple
+                          icon
+                          style="width: 30px; height: 30px;"
+                          v-if="isEditing"
+                          v-on="on"
+                          @click.stop="
+                            dialog.isOpen = true;
+                            willDeleteIndex = index;
+                            openDialogType = 'deleteAnnex'"
+                        >
+                          <v-icon dark>clear</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>删除附件</span>
+                    </v-tooltip>
                   </v-list-tile-action>
                 </v-list-tile>
               </v-list>
