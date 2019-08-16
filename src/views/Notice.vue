@@ -3,7 +3,9 @@
     <v-card v-for="(notice,i) in notice" :key="i">
       <div  @click="check(i)">
       <img src="../assets/NEW.png" alt="" v-if="!notice.checked">
-      <v-card-title class="card_title">{{notice.title}}<span>{{notice.time}}</span></v-card-title>
+      <v-card-title class="card_title">
+        {{notice.title}}<span>{{moment(notice.time,'X').fromNow()}}</span>
+      </v-card-title>
       <div class="link-top"></div>
       <v-card-text>{{notice.content}}</v-card-text>
       </div>
@@ -11,19 +13,29 @@
   </div>
 </template>
 <script>
+import moment from 'moment';
+
+moment.locale('zh-cn');
 
 export default {
   computed: {
     notice() {
       const { noticeArray, readNoticeArray } = this.$store.state;
       const readNoticeArrayId = readNoticeArray.map(item => item.id);
-      return noticeArray.map((item) => {
+      const tempArray = Array.from(noticeArray);
+      return tempArray.map((item) => {
         if (readNoticeArrayId.includes(item.id)) {
           return { ...item, checked: true };
         }
         return { ...item, checked: false };
-      });
+      }).sort((a, b) => b.time - a.time);
     },
+  },
+  destroyed() {
+    this.$store.commit('handleReadNotice');
+  },
+  methods: {
+    moment,
   },
 };
 </script>
