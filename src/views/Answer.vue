@@ -1,11 +1,14 @@
 <template>
-  <div class="answer-container">
+  <div
+    class="answer-container"
+    v-if="questionList.length && questionList[selectedIndex].answer !== undefined"
+  >
     <div class="answer-sidebar-container elevation-3">
       <side-bar-item
         v-for="(item,index) in questionList"
         :key="index"
         :text="item.title"
-        :answered="Boolean(item.answer.length)"
+        :answered="Boolean(item.answer.option.length+item.answer.content.length)"
         :selected="selectedIndex === index"
         @click="selectedIndex = index"
       />
@@ -21,12 +24,12 @@
             {{questionList[selectedIndex].content}}
             <div
               class="answer-content-card-img-container"
-              v-if="questionList[selectedIndex].image"
+              v-if="questionList[selectedIndex].images.length"
             >
               <img
                 class="answer-content-card-img elevation-1"
-                v-for="(item,index) in questionList[selectedIndex].image"
-                :src="item"
+                v-for="(item,index) in questionList[selectedIndex].images"
+                :src="item.src"
                 :key="index"
                 alt=""
                 @click="newTab(item)"
@@ -34,12 +37,12 @@
             </div>
             <div
               class="answer-content-card-attachment"
-              v-if="questionList[selectedIndex].attachment"
+              v-if="questionList[selectedIndex].attachments.length"
             >
               <v-btn
-                v-for="(item,index) in questionList[selectedIndex].attachment"
+                v-for="(item,index) in questionList[selectedIndex].attachments"
                 :key="index"
-                @click="newTab(item.uri)"
+                @click="newTab(item.url)"
                 color="#90CAF9"
                 style="color:white"
               >
@@ -54,7 +57,7 @@
             label="请填写答案"
             rows="10"
             no-resize
-            :value="questionList[selectedIndex].answer"
+            :value="questionList[selectedIndex].answer.content"
             @input="handleValueChange"
             v-if="!questionList[selectedIndex].options.length"
             class="answer-content-card-textarea"
@@ -63,7 +66,7 @@
             v-else
             :mandatory="false"
             @change="handleValueChange"
-            :value="questionList[selectedIndex].answer"
+            :value="questionList[selectedIndex].answer.content"
           >
             <v-radio
               v-for="(option,index) in questionList[selectedIndex].options"
@@ -76,10 +79,8 @@
             <v-btn
               color="grey"
               style="margin-right:40px;color:white"
-              @click="questionList[selectedIndex].answer= ''"
             >重置</v-btn>
           </v-card-actions>
-
         </v-card>
       </div>
       <div class="answer-content-btn-container">
@@ -99,6 +100,9 @@
         >下一题</v-btn>
       </div>
     </div>
+  </div>
+  <div v-else>
+    此处显示一个正在加载
   </div>
 </template>
 
@@ -147,6 +151,7 @@ export default {
   },
   computed: {
     questionList() {
+      console.log(this.$store.state.questionArray);
       return this.$store.state.questionArray;
     },
   },
@@ -155,13 +160,17 @@ export default {
       Debounce: handleTyping, Clear: handleExecute,
     } = DebounceConstructor((val) => {
       submit(this.questionList[this.selectedIndex].id, val);
-      console.log(val);
+      this.$store.commit('handleAnswerChange', { value: val, index: this.selectedIndex });
     }, 800);
     return {
       selectedIndex: 0,
       handleTyping,
       handleExecute,
     };
+  },
+  async mounted() {
+    await this.$store.dispatch('init');
+    console.log(this.questionList);
   },
 };
 </script>
@@ -180,11 +189,10 @@ export default {
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
 
-.v-label--active
-  font-size 23px
-
 .answer-container
   display flex
+  .v-label--active
+    font-size 23px
   .answer-sidebar-container
     padding-top 10px
     height calc(100vh - 80px)

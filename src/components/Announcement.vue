@@ -1,5 +1,5 @@
 <template>
-  <v-card class="announcement">
+  <v-card class="announcement elevation-3">
     <v-snackbar
       v-model="isSnackBarShow"
       :color="isReleaseSuccess? 'success' : 'error'"
@@ -21,24 +21,6 @@
       <v-icon dark>check</v-icon>
     </v-btn>
     <div class="headline">公告编辑</div>
-    <v-text-field
-      v-model="bulletinTitle"
-      outline
-      label="标题"
-      prepend-inner-icon="title"
-      clearable
-      style="width: 50%"
-    />
-    <v-textarea
-      v-model="bulletinContent"
-      prepend-inner-icon="text_fields"
-      auto-grow
-      outline
-      label="内容"
-      clearable
-      style="width: 80%"
-      height="40vh"
-    />
   </v-card>
 </template>
 
@@ -73,8 +55,8 @@ export default {
 <style lang="stylus">
 .announcement
   padding 3rem
-  width 100%
-  height 90%
+  width 90%
+  height 600px
   .headline
     margin-bottom 2rem
   .btn-groups
