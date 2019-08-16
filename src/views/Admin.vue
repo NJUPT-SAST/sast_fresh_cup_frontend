@@ -4,7 +4,7 @@
       <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
       <span class="grey--text">努力加载中......</span>
     </v-card>
-    <v-card class="loading-card" v-show="!isInitSuccess && !isIniting">
+    <v-card class="loading-card" v-show="!isInitSuccess && !isIniting" height="100%" width="100vw">
       <v-icon x-large style="margin-bottom: 2rem" color="error">error</v-icon>
       <span class="grey--text">加载失败，请刷新页面重试！</span>
     </v-card>

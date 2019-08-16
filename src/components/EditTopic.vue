@@ -6,9 +6,7 @@
       right
       top
       :timeout="3000"
-    >
-      {{isSuccess? successMsg : errMsg}}
-    </v-snackbar>
+    >{{isSuccess? successMsg : errMsg}}</v-snackbar>
     <v-dialog
       v-model="dialog.isOpen"
       scrollable
@@ -86,7 +84,21 @@
               :key="index"
               :disabled="!isEditing"
               placeholder="选项"
-            />
+            >
+              <template v-slot:append>
+                <v-btn
+                  fab
+                  dark
+                  color="error"
+                  v-if="isEditing"
+                  @click="removeOption"
+                  :id="index"
+                  style="width: 30px; height: 30px;"
+                >
+                  <v-icon dark :id="index">remove</v-icon>
+                </v-btn>
+              </template>
+            </v-text-field>
           </template>
         </v-card-text>
         <v-divider></v-divider>
@@ -123,7 +135,7 @@
             <v-icon>search</v-icon>
           </v-btn>
         </template>
-        <span>搜索题目ID</span>
+        <span>搜索题目</span>
       </v-tooltip>
       <v-toolbar-title v-if="!isSearching || isEditing">题目编辑</v-toolbar-title>
       <v-text-field
@@ -152,14 +164,22 @@
             icon
             v-show="!isEditing"
             @click.stop="
-          dialog.isOpen = true;
-          willDeleteIndex = activeTab;
-          openDialogType = 'deleteTopic'"
+              dialog.isOpen = true;
+              willDeleteIndex = activeTab;
+              openDialogType = 'deleteTopic'"
           >
             <v-icon>delete</v-icon>
           </v-btn>
         </template>
         <span>删除题目</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <template v-slot:activator="{ on }">
+          <v-btn v-on="on" icon v-show="isEditing" @click="handleCancel">
+            <v-icon>clear</v-icon>
+          </v-btn>
+        </template>
+        <span>取消修改</span>
       </v-tooltip>
       <template v-slot:extension>
         <v-tabs v-model="activeTab" color="cyan" show-arrows grow>
@@ -168,7 +188,7 @@
             v-for="(topic, index) in topicGroups"
             :key="index"
             :disabled="isEditing"
-          >{{ 'QUESTION' + topic.id }}</v-tab>
+          >{{ 'QUESTION' + (index + 1) }}</v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
@@ -206,7 +226,6 @@
                 dark
                 style="margin-bottom: 1rem"
                 @click.stop="dialog.isOpen = true; openDialogType = 'options';"
-                v-if="topic.options.length"
               >{{isEditing? '修改选项' : '查看选项'}}</v-btn>
             </v-card-title>
             <v-card-text
@@ -355,7 +374,7 @@ export default {
     },
     openDialogType: '',
     // 目前选中的题目的选项卡，也是选中的题目的索引
-    activeTab: null,
+    activeTab: 0,
     // 搜索的内容
     searchContent: '',
     // 即将删除的文件索引
@@ -395,25 +414,27 @@ export default {
         const {
           id, title, content, options,
         } = this.topicGroups[this.activeTab];
-        await modifyQuestions(title, content, options, id).then((res) => {
-          this.$store.dispatch('update');
-          this.isEditing = false;
-          this.dialog.isOpen = false;
-          this.isSnackBarShow = true;
-          const { ret, desc } = res;
-          if (ret === 200 && desc === 'successful') {
-            this.isSuccess = true;
-            this.successMsg = '修改成功！';
-          } else {
-            this.errMsg = '修改失败，服务异常！';
+        await modifyQuestions(title, content, options, id)
+          .then((res) => {
+            this.$store.dispatch('update');
+            this.isEditing = false;
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.isSuccess = true;
+              this.successMsg = '修改成功！';
+            } else {
+              this.errMsg = '修改失败，服务异常！';
+              this.isSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.dialog.isOpen = false;
+            this.isSnackBarShow = true;
             this.isSuccess = false;
-          }
-        }).catch((err) => {
-          this.dialog.isOpen = false;
-          this.isSnackBarShow = true;
-          this.isSuccess = false;
-          this.errMsg = '修改失败，服务异常！';
-        });
+            this.errMsg = '修改失败，服务异常！';
+          });
       } else {
         this.isEditing = !this.isEditing;
       }
@@ -435,8 +456,15 @@ export default {
         this.isSearching = false;
       }
     },
+    handleCancel() {
+      this.isEditing = false;
+    },
     addOption() {
       this.topicGroups[this.activeTab].options.push('');
+    },
+    removeOption(e) {
+      const { id } = e.target;
+      this.topicGroups[this.activeTab].options.splice(id, 1);
     },
     async handleDeleteTopic() {
       this.dialog.isOpen = true;
