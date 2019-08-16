@@ -19,6 +19,7 @@
         :isDownDisabled="selectedIndex === questionList.length-1"
         @handleUp="handleQuestionSwitch(true)"
         @handleDown="handleQuestionSwitch(false)"
+        @handleDone="showDone = true"
       />
       <div ref="content">
         <v-card class="answer-content-card">
@@ -84,6 +85,7 @@
             <v-btn
               color="grey"
               style="margin-right:40px;color:white"
+              @click.stop="handleValueChange('')"
             >重置</v-btn>
           </v-card-actions>
         </v-card>
@@ -105,6 +107,39 @@
         >下一题</v-btn>
       </div> -->
     </div>
+
+  <v-dialog
+      :value="showDone"
+      max-width="290"
+      persistent
+    >
+      <v-card>
+        <v-card-title class="headline">确认要提交交卷吗？</v-card-title>
+
+        <v-card-text>是否确认要交卷？</v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="error"
+            text
+            @click="showDone = false"
+          >
+            取消
+          </v-btn>
+
+          <v-btn
+            color="green"
+            text
+            style="color:white"
+            @click="$router.push({name:'homepage'})"
+          >
+            确认提交
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   </div>
   <v-card v-else class="loading-card" height="100%" width="100vw">
     <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
@@ -168,10 +203,11 @@ export default {
       this.$store.commit('handleAnswerChange', { value: val, index: this.selectedIndex });
     }, 800);
     return {
-      selectedIndex: 0,
       handleTyping,
       handleExecute,
       baseURL,
+      selectedIndex: 0,
+      showDone: false,
     };
   },
   async mounted() {

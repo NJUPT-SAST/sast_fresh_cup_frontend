@@ -29,6 +29,7 @@
       large
       color="green"
       style="color:white"
+      @click="$emit('handleDone')"
     >
       <v-icon>done</v-icon>
     </v-btn>
