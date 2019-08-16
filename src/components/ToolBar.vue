@@ -65,14 +65,6 @@ export default {
       this.$router.push({ name: 'login' });
     }
   },
-  watch: {
-    // 对于清除公告角标应放置在ToolBar还是Notice，这个后面再看一下
-    $route(val) {
-      if (val.name === 'notice') {
-        this.$store.commit('handleReadNotice');
-      }
-    },
-  },
 };
 </script>
 
