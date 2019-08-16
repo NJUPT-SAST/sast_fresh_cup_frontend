@@ -92,13 +92,18 @@ export default {
     this.isIniting = true;
     await this.$store
       .dispatch('init')
-      .then((res) => {
-        this.isIniting = false;
+      .then(() => {
         this.isInitSuccess = true;
       })
-      .catch((err) => {
-        this.isIniting = false;
+      .catch(() => {
         this.isInitSuccess = false;
+      }).finally(() => {
+        this.isIniting = false;
+        const { username, email } = this.$store.state.userinfo;
+        // 用户名或邮箱不存在则跳转到登录页
+        if (!username || !email) {
+          this.$router.push({ name: 'login' });
+        }
       });
   },
 };
