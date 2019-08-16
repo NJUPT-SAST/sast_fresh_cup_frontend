@@ -172,7 +172,14 @@ export default {
   }),
   computed: {
     noticeList() {
-      return this.$store.state.noticeArray;
+      const noticeGroups = this.$store.state.noticeArray;
+      const compare = p => (m, n) => {
+        const a = m[p];
+        const b = n[p];
+        return b - a;
+      };
+      noticeGroups.sort(compare('time'));
+      return noticeGroups;
     },
     pageNum() {
       return this.$store.state.noticeArray.length % 4 === 0

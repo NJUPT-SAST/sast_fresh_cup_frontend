@@ -135,19 +135,26 @@
             <v-icon>search</v-icon>
           </v-btn>
         </template>
-        <span>搜索题目</span>
+        <span>搜索题目标题</span>
       </v-tooltip>
-      <v-toolbar-title v-if="!isSearching || isEditing">题目编辑</v-toolbar-title>
-      <v-text-field
-        v-else-if="isSearching && !isEditing"
-        append-outer-icon="send"
+      <v-toolbar-title v-if="!isSearchClick || isEditing">题目编辑</v-toolbar-title>
+      <v-autocomplete
+        v-model="selectItem"
+        v-else-if="isSearchClick && !isEditing"
+        :loading="isSearching"
+        :items="searchItems"
+        :search-input.sync="searchContent"
+        no-data-text="未找到内容"
+        class="mx-3"
         flat
-        placeholder="题目ID"
+        hide-details
+        cache-items
+        autofocus
+        clearable
+        label="题目标题"
         solo-inverted
         style="margin-top: 10px"
-        @click:append-outer="handleSearch"
-        v-model="searchContent"
-      ></v-text-field>
+      ></v-autocomplete>
       <v-spacer></v-spacer>
       <v-tooltip left>
         <template v-slot:activator="{ on }">
@@ -364,7 +371,7 @@ export default {
   data: () => ({
     isSnackBarShow: false,
     isSuccess: false,
-    isSearching: false,
+    isSearchClick: false,
     isEditing: false,
     isGettingQuestions: false,
     isGetQuestionsSuccess: false,
@@ -375,18 +382,45 @@ export default {
     openDialogType: '',
     // 目前选中的题目的选项卡，也是选中的题目的索引
     activeTab: 0,
-    // 搜索的内容
-    searchContent: '',
     // 即将删除的文件索引
     willDeleteIndex: -1,
     baseURL,
     successMsg: '',
     errMsg: '',
+    // 正在搜索
+    isSearching: false,
+    // 搜索到的内容，显示在下拉框
+    searchItems: [],
+    // 搜索框输入的内容
+    searchContent: '',
+    // 在下拉框中选择的项
+    selectItem: '',
   }),
   computed: {
     // 获取题目后的题目数组
     topicGroups() {
       return this.$store.state.questionArray;
+    },
+    // 储存题目标题以供搜索
+    topicTitles() {
+      return this.$store.state.questionArray.map(item => item.title);
+    },
+  },
+  watch: {
+    // 搜索内容改变则开始检索
+    searchContent(val) {
+      if (val) {
+        if (val !== this.selectItem) {
+          this.handleSearch(val);
+        }
+      }
+    },
+    // 点击搜索项后跳转到那道题
+    selectItem(val) {
+      const titleIndex = this.topicTitles.findIndex(title => val === title);
+      if (titleIndex !== -1) {
+        this.activeTab = titleIndex;
+      }
     },
   },
   async mounted() {
@@ -440,21 +474,17 @@ export default {
       }
     },
     handleSearchClick() {
-      this.isSearching = !this.isSearching;
+      this.isSearchClick = !this.isSearchClick;
     },
-    handleSearch() {
-      const searchIndex = this.topicGroups.findIndex(
-        item => item.id === Number(this.searchContent),
-      );
-      if (searchIndex === -1) {
-        this.isSnackBarShow = true;
-        this.isSuccess = false;
-        this.errMsg = '未找到ID，请检查输入是否正确！';
-      } else {
-        this.activeTab = searchIndex;
-        this.searchContent = '';
+    handleSearch(searchContent) {
+      this.isSearching = true;
+      // 搜索的进度条，假装花了点时间
+      setTimeout(() => {
+        this.searchItems = this.topicTitles.filter(
+          item => (item || '').indexOf(searchContent || '') > -1,
+        );
         this.isSearching = false;
-      }
+      }, 500);
     },
     handleCancel() {
       this.isEditing = false;
