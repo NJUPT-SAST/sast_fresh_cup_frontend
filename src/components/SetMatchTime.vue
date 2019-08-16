@@ -6,7 +6,7 @@
       :right="true"
       :top="true"
       :timeout="3000"
-    >{{isSetSuccess? "设置成功！" : "设置失败，服务异常！"}}</v-snackbar>
+    >{{isSetSuccess? "设置成功！" : errMsg}}</v-snackbar>
     <v-btn
       fab
       dark
@@ -39,7 +39,7 @@
         width="290px"
       >
         <template v-slot:activator="{ on }">
-          <v-text-field v-model="matchDate" label="比赛日期" prepend-icon="event" readonly v-on="on" />
+          <v-text-field v-model="matchDate" label="比赛日期" prepend-icon="event" readonly v-on="on"/>
         </template>
         <v-date-picker v-model="matchDate" scrollable color="primary">
           <v-spacer></v-spacer>
@@ -96,11 +96,6 @@
         </v-time-picker>
       </v-dialog>
     </div>
-    <div class="btn-groups">
-      <v-btn color="grey lighten-1" @click="handleReset">重置
-        <v-icon right dark>reply</v-icon>
-      </v-btn>
-    </div>
   </v-card>
 </template>
 
@@ -115,45 +110,64 @@ export default {
     dateModal: false,
     startModal: false,
     endModal: false,
-    startTime: null,
-    endTime: null,
+    startTime: '',
+    endTime: '',
     matchDate: '',
+    matchName: '',
+    errMsg: '',
   }),
-  computed: {
-    matchName() {
-      return this.$store.state.name;
-    },
+  mounted() {
+    const startTimeStamp = this.$store.state.due.start;
+    const endTimeStamp = this.$store.state.due.end;
+    const startDate = new Date(startTimeStamp * 1000);
+    const endDate = new Date(endTimeStamp * 1000);
+
+    this.matchName = this.$store.state.name;
+
+    this.matchDate = `${startDate.getFullYear()}-${
+      startDate.getMonth() + 1 < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1
+    }-${startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}`;
+
+    this.startTime = `${
+      startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()
+    }:${startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}`;
+
+    this.endTime = `${endDate.getHours() < 10 ? `0${endDate.getHours()}` : endDate.getHours()}:${
+      endDate.getMinutes() < 10 ? `0${endDate.getMinutes()}` : endDate.getMinutes()
+    }`;
   },
   methods: {
     async handleSetting() {
-      this.isSetting = true;
       const startStr = `${this.matchDate} ${this.startTime}`;
       const endStr = `${this.matchDate} ${this.endTime}`;
       const startTimeStamp = Date.parse(new Date(startStr.replace(/-/g, '/'))) / 1000;
       const endTimeStamp = Date.parse(new Date(endStr.replace(/-/g, '/'))) / 1000;
-      await modifyDue({ start: startTimeStamp, end: endTimeStamp, name: this.matchName })
-        .then((res) => {
-          this.isSetting = false;
-          this.isSnackBarShow = true;
-          const { ret, desc } = res;
-          if (ret === 200 && desc === 'successful') {
-            this.$store.dispatch('update');
-            this.handleReset();
-            this.isSetSuccess = true;
-          } else {
+      if (startTimeStamp < endTimeStamp) {
+        this.isSetting = true;
+        await modifyDue({ start: startTimeStamp, end: endTimeStamp, name: this.matchName })
+          .then((res) => {
+            this.isSetting = false;
+            this.isSnackBarShow = true;
+            const { ret, desc } = res;
+            if (ret === 200 && desc === 'successful') {
+              this.$store.dispatch('update');
+              this.isSetSuccess = true;
+            } else {
+              this.errMsg = '设置失败，服务异常！';
+              this.isSetSuccess = false;
+            }
+          })
+          .catch((err) => {
+            this.isSetting = false;
+            this.isSnackBarShow = true;
             this.isSetSuccess = false;
-          }
-        })
-        .catch((err) => {
-          this.isSetting = false;
-          this.isSnackBarShow = true;
-          this.isSetSuccess = false;
-        });
-    },
-    handleReset() {
-      this.matchDate = '';
-      this.startTime = null;
-      this.endTime = null;
+            this.errMsg = '设置失败，服务异常！';
+          });
+      } else {
+        this.isSnackBarShow = true;
+        this.isSetSuccess = false;
+        this.errMsg = '起始时间不可大于/等于结束时间！';
+      }
     },
   },
 };
