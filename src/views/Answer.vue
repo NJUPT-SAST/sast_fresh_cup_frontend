@@ -269,6 +269,7 @@ export default {
         line-height 1.3
         letter-spacing 2px
       .answer-content-card-title
+        user-select none
         font-size 36px
       .answer-content-card-text
         font-size 18px
