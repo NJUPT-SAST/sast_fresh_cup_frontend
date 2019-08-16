@@ -18,6 +18,29 @@ const injectAnswer = (questionArray, submittedArray) => {
   });
 };
 
+const INIT_STATE = {
+  noticeArray: [],
+  questionArray: [],
+  due: {
+    start: 0,
+    end: 0,
+  },
+  readNoticeArray: [],
+  hash: {
+    problemsMd5: '',
+    noticesMd5: '',
+  },
+  name: '',
+  userinfo: {
+    id: 0,
+    username: '',
+    email: '',
+    isAdmin: 0,
+  },
+  submittedArray: [],
+  loginStatus: false,
+};
+
 const state = {
   noticeArray: [],
   questionArray: [],
@@ -38,6 +61,7 @@ const state = {
     isAdmin: 0,
   },
   submittedArray: [],
+  loginStatus: !!localStorage.getItem('fresh_cup_token'),
 };
 
 const getters = {
@@ -69,6 +93,12 @@ const mutations = {
   },
   handleSubmittedInit(State, newSubmitted) {
     State.submittedArray = newSubmitted;
+  },
+  handleResetState(State, initState) {
+    Object.assign(state, initState);
+  },
+  handleLoginStatus(State, newStatus) {
+    State.loginStatus = newStatus;
   },
 };
 
@@ -111,6 +141,9 @@ const actions = {
     const newQuestionArray = await injectAnswer(tempQuestionArray, submitted);
     await commit('injectCommitted', newQuestionArray);
     await commit('handleSubmittedInit', submitted);
+  },
+  async reset({ commit }) {
+    await commit('handleResetState', INIT_STATE);
   },
 };
 
