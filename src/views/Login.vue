@@ -6,7 +6,7 @@
       :right="true"
       :top="true"
       :timeout="3000"
-    >登录失败，请检查学号或密码是否正确</v-snackbar>
+    >登录失败，请检查用户名/邮箱或密码是否正确</v-snackbar>
     <v-container fluid fill-height>
       <v-layout align-center justify-center>
         <v-flex xs12 sm8 md4>
@@ -18,7 +18,7 @@
             <v-card-text>
               <v-form>
                 <v-text-field
-                  label="学号"
+                  label="用户名/邮箱"
                   :clearable="true"
                   v-model="studentID"
                   name="login"
@@ -59,23 +59,19 @@ export default {
   }),
   methods: {
     async handleLogin() {
-      /** 登录成功 => */
-      // /** 登录失败 => */ this.loginError = true;
       this.btnLoading = true;
       const { ret } = await login(this.studentID, this.password);
       if (ret === 200) {
         const {
-          data: {
-            is_admin: isAdmin, ...rest
-          },
+          data: { is_admin: isAdmin, ...rest },
         } = await userinfo();
         this.$store.commit('handleUserinfo', {
-          ...rest, isAdmin,
+          ...rest,
+          isAdmin,
         });
-        setInterval(() => {
-          this.$store.dispatch('update');
-        }, 10000);
-        await this.$store.dispatch('init');
+        await this.$store.dispatch('init').then(() => {
+          this.$store.commit('handleLoginStatus', true);
+        });
         this.btnLoading = false;
         if (isAdmin) {
           this.$router.push({ name: 'admin' });
@@ -92,5 +88,5 @@ export default {
 
 <style lang="stylus">
 .login-container
-  height 88vh
+  height calc(100vh - 80px - 36px)
 </style>
