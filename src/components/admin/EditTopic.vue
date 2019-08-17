@@ -365,7 +365,7 @@
 <script>
 import {
   modifyQuestions, deleteQuestions, addSource, deleteSource, baseURL,
-} from '../api/index';
+} from '@/api/index';
 
 export default {
   data: () => ({

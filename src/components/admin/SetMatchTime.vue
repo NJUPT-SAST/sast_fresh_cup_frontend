@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { modifyDue } from '../api/index';
+import { modifyDue } from '@/api/index';
 
 export default {
   data: () => ({

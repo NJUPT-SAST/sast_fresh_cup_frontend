@@ -148,8 +148,8 @@
 </template>
 
 <script>
-import SideBarItem from '../components/SideBarItem';
-import FabGroup from '../components/FabGroup';
+import SideBarItem from '../components/answer/SideBarItem';
+import FabGroup from '../components/answer/FabGroup';
 import DebounceConstructor from '../utils/debounce.js';
 import { submit, baseURL } from '../api/index.js';
 

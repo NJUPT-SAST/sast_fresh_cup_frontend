@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import ToolBar from './components/ToolBar';
-import Footer from './components/Footer';
+import ToolBar from './components/common/ToolBar';
+import Footer from './components/common/Footer';
 
 import * as api from './api/index.js';
 
