@@ -95,7 +95,7 @@ const mutations = {
     State.submittedArray = newSubmitted;
   },
   handleResetState(State, initState) {
-    Object.assign(state, initState);
+    Object.assign(State, initState);
   },
   handleLoginStatus(State, newStatus) {
     State.loginStatus = newStatus;

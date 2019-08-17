@@ -67,14 +67,17 @@ export default {
       this.showSnackbar = false;
       this.jump('notice');
     },
-    handleLoginStatus() {
+    async handleLoginStatus() {
       if (this.loginStatus) {
         this.logoutDialog = false;
         localStorage.removeItem('fresh_cup_token');
         this.$store.commit('handleLoginStatus', false);
-        this.$store.dispatch('reset');
+        await this.$store.dispatch('reset').then(() => {
+          this.jump('login');
+        });
+      } else {
+        this.jump('login');
       }
-      this.jump('login');
     },
     handleInterval() {
       if (this.loginStatus) {
