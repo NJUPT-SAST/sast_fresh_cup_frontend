@@ -18,4 +18,5 @@ export default {
     isAdmin: 0,
   },
   submittedArray: [],
+  loginStatus: !!localStorage.getItem('fresh_cup_token'),
 };

@@ -14,6 +14,30 @@ const injectAnswer = (questionArray, submittedArray) => {
   });
 };
 
+const INIT_STATE = {
+  noticeArray: [],
+  questionArray: [],
+  due: {
+    start: 0,
+    end: 0,
+  },
+  readNoticeArray: [],
+  hash: {
+    problemsMd5: '',
+    noticesMd5: '',
+  },
+  name: '',
+  userinfo: {
+    id: 0,
+    username: '',
+    email: '',
+    isAdmin: 0,
+  },
+  submittedArray: [],
+  loginStatus: false,
+};
+
+
 export default {
   async update({ commit, state }) {
     const requestList = [];
@@ -53,5 +77,8 @@ export default {
     const newQuestionArray = await injectAnswer(tempQuestionArray, submitted);
     await commit('injectCommitted', newQuestionArray);
     await commit('handleSubmittedInit', submitted);
+  },
+  async reset({ commit }) {
+    await commit('handleResetState', INIT_STATE);
   },
 };

@@ -21,4 +21,10 @@ export default {
   handleSubmittedInit(state, newSubmitted) {
     state.submittedArray = newSubmitted;
   },
+  handleResetState(state, initState) {
+    Object.assign(state, initState);
+  },
+  handleLoginStatus(state, newStatus) {
+    state.loginStatus = newStatus;
+  },
 };
