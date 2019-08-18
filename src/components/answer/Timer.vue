@@ -4,7 +4,7 @@
       class="timer elevation-4"
       :color="color"
       :value="percentage*100"
-      :size="70"
+      :size="75"
       :rotate="-90"
     >{{rest}}min</v-progress-circular>
   </div>
@@ -38,14 +38,11 @@ export default {
 
 <style lang="stylus">
 .timer
-  position fixed
-  bottom 130px
-  right 16px
   z-index 4
   background-color white
   cursor pointer
   border-radius 50%
   transition all 0.3s
 .timer:hover
-  transform scale(3.2) translate(-20px,-20px)
+  transform scale(1.9) translate(-20px,-20px)
 </style>

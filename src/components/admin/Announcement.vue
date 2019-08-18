@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import { modifyNotice, deleteNotice } from '../api/index';
+import { modifyNotice, deleteNotice } from '@/api/index';
 
 export default {
   data: () => ({

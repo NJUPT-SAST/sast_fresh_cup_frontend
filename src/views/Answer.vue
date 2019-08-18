@@ -14,7 +14,13 @@
       />
     </div>
     <div class="answer-content">
-      <fab-group />
+      <fab-group
+        :isUpDisabled="selectedIndex === 0"
+        :isDownDisabled="selectedIndex === questionList.length-1"
+        @handleUp="handleQuestionSwitch(true)"
+        @handleDown="handleQuestionSwitch(false)"
+        @handleDone="showDone = true"
+      />
       <div ref="content">
         <v-card class="answer-content-card">
           <v-card-title class="answer-content-card-title">
@@ -29,10 +35,10 @@
               <img
                 class="answer-content-card-img elevation-1"
                 v-for="(item,index) in questionList[selectedIndex].images"
-                :src="item.src"
+                :src="baseURL + item.url"
                 :key="index"
-                alt=""
-                @click="newTab(item)"
+                :alt="item.name"
+                @click="newTab(baseURL + item.url)"
               >
             </div>
             <div
@@ -42,11 +48,11 @@
               <v-btn
                 v-for="(item,index) in questionList[selectedIndex].attachments"
                 :key="index"
-                @click="newTab(item.url)"
+                @click="newTab(baseURL+item.url)"
                 color="#90CAF9"
                 style="color:white"
               >
-                {{item.text}}
+                {{item.name}}
               </v-btn>
             </div>
           </v-card-text>
@@ -79,11 +85,12 @@
             <v-btn
               color="grey"
               style="margin-right:40px;color:white"
+              @click.stop="handleValueChange('')"
             >重置</v-btn>
           </v-card-actions>
         </v-card>
       </div>
-      <div class="answer-content-btn-container">
+      <!-- <div class="answer-content-btn-container">
         <v-btn
           :disabled="selectedIndex === 0"
           @click="handleQuestionSwitch(true)"
@@ -98,19 +105,53 @@
           large
           color="#CFD8DC"
         >下一题</v-btn>
-      </div>
+      </div> -->
     </div>
+
+  <v-dialog
+      :value="showDone"
+      max-width="290"
+      persistent
+    >
+      <v-card>
+        <v-card-title class="headline">确认要提交交卷吗？</v-card-title>
+
+        <v-card-text>是否确认要交卷？</v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="error"
+            text
+            @click="showDone = false"
+          >
+            取消
+          </v-btn>
+
+          <v-btn
+            color="green"
+            text
+            style="color:white"
+            @click="$router.push({name:'homepage'})"
+          >
+            确认提交
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   </div>
-  <div v-else>
-    此处显示一个正在加载
-  </div>
+  <v-card v-else class="loading-card" height="100%" width="100vw">
+    <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
+    <span class="grey--text">努力加载中......</span>
+  </v-card>
 </template>
 
 <script>
-import SideBarItem from '../components/SideBarItem';
-import FabGroup from '../components/FabGroup';
+import SideBarItem from '../components/answer/SideBarItem';
+import FabGroup from '../components/answer/FabGroup';
 import DebounceConstructor from '../utils/debounce.js';
-import { submit } from '../api/index.js';
+import { submit, baseURL } from '../api/index.js';
 
 export default {
   name: 'Answer',
@@ -151,7 +192,6 @@ export default {
   },
   computed: {
     questionList() {
-      console.log(this.$store.state.questionArray);
       return this.$store.state.questionArray;
     },
   },
@@ -163,14 +203,18 @@ export default {
       this.$store.commit('handleAnswerChange', { value: val, index: this.selectedIndex });
     }, 800);
     return {
-      selectedIndex: 0,
       handleTyping,
       handleExecute,
+      baseURL,
+      selectedIndex: 0,
+      showDone: false,
     };
   },
   async mounted() {
-    await this.$store.dispatch('init');
-    console.log(this.questionList);
+    const { questionList, selectedIndex } = this;
+    if (!questionList.length || questionList[selectedIndex].answer === undefined) {
+      await this.$store.dispatch('init');
+    }
   },
 };
 </script>
@@ -188,6 +232,12 @@ export default {
   background: #bbb;
 // ::-webkit-scrollbar-thumb:window-inactive
 //   background: rgba(255,0,0,0.4);
+
+.loading-card
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
 
 .answer-container
   display flex
@@ -219,6 +269,7 @@ export default {
         line-height 1.3
         letter-spacing 2px
       .answer-content-card-title
+        user-select none
         font-size 36px
       .answer-content-card-text
         font-size 18px

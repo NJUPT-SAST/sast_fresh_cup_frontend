@@ -1,11 +1,7 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
 import {
   getNotice, getQuestions, getSubmitted, getHash,
-} from './api/index';
+} from '@/api/index';
 
-Vue.use(Vuex);
 
 const injectAnswer = (questionArray, submittedArray) => {
   const submittedMap = new Map(
@@ -18,7 +14,7 @@ const injectAnswer = (questionArray, submittedArray) => {
   });
 };
 
-const state = {
+const INIT_STATE = {
   noticeArray: [],
   questionArray: [],
   due: {
@@ -38,42 +34,12 @@ const state = {
     isAdmin: 0,
   },
   submittedArray: [],
+  loginStatus: false,
 };
 
-const getters = {
-  unreadNoticeCount(State) {
-    const { noticeArray, readNoticeArray } = State;
-    return noticeArray.length - readNoticeArray.length;
-  },
-};
 
-const mutations = {
-  handleReadNotice(State) {
-    State.readNoticeArray = State.noticeArray;
-  },
-  handleUpdate(State, newState) {
-    Object.keys(newState).forEach((key) => {
-      State[key] = newState[key];
-    });
-  },
-  handleAnswerChange(State, { value, index }) {
-    State.questionArray[index].answer.content = value;
-  },
-  injectCommitted(State, newQuestionArray) {
-    State.questionArray = newQuestionArray;
-  },
-  handleUserinfo(State, data) {
-    Object.keys(data).forEach((key) => {
-      State.userinfo[key] = data[key];
-    });
-  },
-  handleSubmittedInit(State, newSubmitted) {
-    State.submittedArray = newSubmitted;
-  },
-};
-
-const actions = {
-  async update({ commit, state: State }) {
+export default {
+  async update({ commit, state }) {
     const requestList = [];
     const newState = {};
     const {
@@ -84,7 +50,7 @@ const actions = {
     const {
       name: oldName, due: { start: oldStart, end: oldEnd },
       hash: { problemsMd5: oldProblemMd5, noticesMd5: oldNoticeMd5 },
-    } = State;
+    } = state;
 
     if (problemsMd5 !== oldProblemMd5) requestList.push(getQuestions);
     if (noticesMd5 !== oldNoticeMd5) requestList.push(getNotice);
@@ -102,18 +68,17 @@ const actions = {
       });
     }
 
-    commit('handleUpdate', newState);
+    await commit('handleUpdate', newState);
   },
   async init({ dispatch, commit }) {
     await dispatch('update');
     const tempQuestionArray = this.state.questionArray;
     const { data: submitted } = await getSubmitted();
-    const newQuestionArray = injectAnswer(tempQuestionArray, submitted);
-    commit('injectCommitted', newQuestionArray);
-    commit('handleSubmittedInit', submitted);
+    const newQuestionArray = await injectAnswer(tempQuestionArray, submitted);
+    await commit('injectCommitted', newQuestionArray);
+    await commit('handleSubmittedInit', submitted);
+  },
+  async reset({ commit }) {
+    await commit('handleResetState', INIT_STATE);
   },
 };
-
-export default new Vuex.Store({
-  state, getters, mutations, actions,
-});

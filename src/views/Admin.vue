@@ -66,10 +66,10 @@
 </template>
 
 <script>
-import Announcement from '../components/Announcement';
-import SetMatchTime from '../components/SetMatchTime';
-import AddTopic from '../components/AddTopic';
-import EditTopic from '../components/EditTopic';
+import Announcement from '../components/admin/Announcement';
+import SetMatchTime from '../components/admin/SetMatchTime';
+import AddTopic from '../components/admin/AddTopic';
+import EditTopic from '../components/admin/EditTopic';
 
 export default {
   components: {
