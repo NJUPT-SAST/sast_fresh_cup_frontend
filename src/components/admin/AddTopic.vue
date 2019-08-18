@@ -124,6 +124,7 @@
 <script>
 import XLSX from 'xlsx';
 import { modifyQuestions, modifyQuestionsMassively } from '@/api/index';
+import template from '../../assets/template.xlsx';
 
 export default {
   data: () => ({
@@ -148,6 +149,7 @@ export default {
     },
     // 上传Excel时将 submitTopic push 进这个数组，用 Array<object> 提交
     topicGroups: [],
+    template,
   }),
   methods: {
     addOption() {
@@ -267,6 +269,7 @@ export default {
     },
     handleDownload() {
       this.downloadDialog = false;
+      window.location.href = this.template;
       // const templateJSON = [
       //   {
       //     题目标题: '',
