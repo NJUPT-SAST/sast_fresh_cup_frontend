@@ -1,11 +1,7 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
 import {
   getNotice, getQuestions, getSubmitted, getHash,
-} from './api/index';
+} from '@/api/index';
 
-Vue.use(Vuex);
 
 const injectAnswer = (questionArray, submittedArray) => {
   const submittedMap = new Map(
@@ -41,69 +37,9 @@ const INIT_STATE = {
   loginStatus: false,
 };
 
-const state = {
-  noticeArray: [],
-  questionArray: [],
-  due: {
-    start: 0,
-    end: 0,
-  },
-  readNoticeArray: [],
-  hash: {
-    problemsMd5: '',
-    noticesMd5: '',
-  },
-  name: '',
-  userinfo: {
-    id: 0,
-    username: '',
-    email: '',
-    isAdmin: 0,
-  },
-  submittedArray: [],
-  loginStatus: !!localStorage.getItem('fresh_cup_token'),
-};
 
-const getters = {
-  unreadNoticeCount(State) {
-    const { noticeArray, readNoticeArray } = State;
-    return noticeArray.length - readNoticeArray.length;
-  },
-};
-
-const mutations = {
-  handleReadNotice(State) {
-    State.readNoticeArray = State.noticeArray;
-  },
-  handleUpdate(State, newState) {
-    Object.keys(newState).forEach((key) => {
-      State[key] = newState[key];
-    });
-  },
-  handleAnswerChange(State, { value, index }) {
-    State.questionArray[index].answer.content = value;
-  },
-  injectCommitted(State, newQuestionArray) {
-    State.questionArray = newQuestionArray;
-  },
-  handleUserinfo(State, data) {
-    Object.keys(data).forEach((key) => {
-      State.userinfo[key] = data[key];
-    });
-  },
-  handleSubmittedInit(State, newSubmitted) {
-    State.submittedArray = newSubmitted;
-  },
-  handleResetState(State, initState) {
-    Object.assign(State, initState);
-  },
-  handleLoginStatus(State, newStatus) {
-    State.loginStatus = newStatus;
-  },
-};
-
-const actions = {
-  async update({ commit, state: State }) {
+export default {
+  async update({ commit, state }) {
     const requestList = [];
     const newState = {};
     const {
@@ -114,7 +50,7 @@ const actions = {
     const {
       name: oldName, due: { start: oldStart, end: oldEnd },
       hash: { problemsMd5: oldProblemMd5, noticesMd5: oldNoticeMd5 },
-    } = State;
+    } = state;
 
     if (problemsMd5 !== oldProblemMd5) requestList.push(getQuestions);
     if (noticesMd5 !== oldNoticeMd5) requestList.push(getNotice);
@@ -146,7 +82,3 @@ const actions = {
     await commit('handleResetState', INIT_STATE);
   },
 };
-
-export default new Vuex.Store({
-  state, getters, mutations, actions,
-});

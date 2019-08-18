@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-import globalNotification from '../utils/globalNotification';
+import globalNotification from '@/utils/globalNotification';
 
 export default {
   name: 'ToolBar',

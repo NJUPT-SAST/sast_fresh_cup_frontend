@@ -104,7 +104,7 @@
 
 <script>
 import XLSX from 'xlsx';
-import { modifyQuestions, modifyQuestionsMassively } from '../api/index';
+import { modifyQuestions, modifyQuestionsMassively } from '@/api/index';
 
 export default {
   data: () => ({
