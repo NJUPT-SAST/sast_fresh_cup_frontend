@@ -97,13 +97,9 @@ export default {
       })
       .catch(() => {
         this.isInitSuccess = false;
-      }).finally(() => {
+      })
+      .finally(() => {
         this.isIniting = false;
-        const { username, email } = this.$store.state.userinfo;
-        // 用户名或邮箱不存在则跳转到登录页
-        if (!username || !email) {
-          this.$router.push({ name: 'login' });
-        }
       });
   },
 };

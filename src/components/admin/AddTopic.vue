@@ -38,6 +38,25 @@
         >
         <v-icon right dark>cloud_upload</v-icon>
       </v-btn>
+      <v-dialog v-model="downloadDialog" persistent max-width="300">
+        <template v-slot:activator="{ on }">
+          <v-btn color="blue-grey" class="white--text upload-btn" v-on="on">下载模板</v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline">下载前须知：</v-card-title>
+          <v-card-text>
+            <div>1.若有额外选项请在第一行添加字样为“额外选项”的单元格；</div>
+            <div class="red--text">2.请勿合并单元格，否则将导致解析错误；</div>
+            <div>3.选项内容可为空，即为填空题；</div>
+            <div class="red--text">4.题目标题与内容必填；</div>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="error darken-1" flat @click="downloadDialog = false">取消</v-btn>
+            <v-btn color="green darken-1" flat @click="handleDownload">下载</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
     <div class="add-part">
       <div class="left-part">
@@ -112,6 +131,7 @@ export default {
     isSubmitSuccess: false,
     isUploading: false,
     isSubmiting: false,
+    downloadDialog: false,
     tabsOptions: ['选项'],
     activeTab: null,
     topicChoice: [
@@ -244,6 +264,41 @@ export default {
         };
         fileReader.readAsBinaryString(files[0]);
       }
+    },
+    handleDownload() {
+      this.downloadDialog = false;
+      // const templateJSON = [
+      //   {
+      //     题目标题: '',
+      //     题目内容: '',
+      //     选项一: '',
+      //     选项二: '',
+      //     选项三: '',
+      //     选项四: '',
+      //   },
+      // ];
+      // const cleanWorkbook = XLSX.utils.book_new();
+      // const worksheet = XLSX.utils.json_to_sheet(templateJSON);
+      // XLSX.utils.book_append_sheet(cleanWorkbook, worksheet, '模板');
+      // const stringToArrayBuffer = (string) => {
+      //   const buffer = new ArrayBuffer(string.length);
+      //   const view = new Uint8Array(buffer);
+      //   for (let i = 0; i !== string.length; ++i) {
+      //     view[i] = string.charCodeAt(i) & 0xff;
+      //   }
+      //   return buffer;
+      // };
+      // const ab = stringToArrayBuffer(
+      //   XLSX.write(cleanWorkbook, {
+      //     bookType: 'xlsx',
+      //     type: 'binary',
+      //   }),
+      // );
+      // const tmpDown = new Blob([ab], { type: '' });
+      // const a = document.createElement('a');
+      // a.href = URL.createObjectURL(tmpDown);
+      // a.download = 'template.xlsx';
+      // a.click();
     },
   },
 };
