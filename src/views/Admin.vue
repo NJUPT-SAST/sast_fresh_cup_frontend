@@ -92,13 +92,14 @@ export default {
     this.isIniting = true;
     await this.$store
       .dispatch('init')
-      .then((res) => {
-        this.isIniting = false;
+      .then(() => {
         this.isInitSuccess = true;
       })
-      .catch((err) => {
-        this.isIniting = false;
+      .catch(() => {
         this.isInitSuccess = false;
+      })
+      .finally(() => {
+        this.isIniting = false;
       });
   },
 };

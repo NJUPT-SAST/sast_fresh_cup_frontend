@@ -38,6 +38,27 @@
         >
         <v-icon right dark>cloud_upload</v-icon>
       </v-btn>
+      <v-dialog v-model="downloadDialog" persistent max-width="300">
+        <template v-slot:activator="{ on }">
+          <v-btn color="blue-grey" class="white--text upload-btn" v-on="on">下载模板</v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="headline">下载前须知：</v-card-title>
+          <v-divider />
+          <v-card-text>
+            <div>1.若有额外选项请在第一行添加字样为“额外选项”的单元格；</div>
+            <div class="red--text">2.请勿合并单元格，否则将导致解析错误；</div>
+            <div>3.选项内容可为空，即为填空题；</div>
+            <div class="red--text">4.题目标题与内容必填；</div>
+          </v-card-text>
+          <v-divider />
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="error darken-1" flat @click="downloadDialog = false">取消</v-btn>
+            <v-btn color="green darken-1" flat @click="handleDownload">下载</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
     <div class="add-part">
       <div class="left-part">
@@ -105,6 +126,7 @@
 <script>
 import XLSX from 'xlsx';
 import { modifyQuestions, modifyQuestionsMassively } from '@/api/index';
+import template from '../../assets/template.xlsx';
 
 export default {
   data: () => ({
@@ -112,6 +134,7 @@ export default {
     isSubmitSuccess: false,
     isUploading: false,
     isSubmiting: false,
+    downloadDialog: false,
     tabsOptions: ['选项'],
     activeTab: null,
     topicChoice: [
@@ -128,6 +151,7 @@ export default {
     },
     // 上传Excel时将 submitTopic push 进这个数组，用 Array<object> 提交
     topicGroups: [],
+    template,
   }),
   methods: {
     addOption() {
@@ -244,6 +268,10 @@ export default {
         };
         fileReader.readAsBinaryString(files[0]);
       }
+    },
+    handleDownload() {
+      this.downloadDialog = false;
+      window.location.href = this.template;
     },
   },
 };
