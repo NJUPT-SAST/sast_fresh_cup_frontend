@@ -44,12 +44,14 @@
         </template>
         <v-card>
           <v-card-title class="headline">下载前须知：</v-card-title>
+          <v-divider />
           <v-card-text>
             <div>1.若有额外选项请在第一行添加字样为“额外选项”的单元格；</div>
             <div class="red--text">2.请勿合并单元格，否则将导致解析错误；</div>
             <div>3.选项内容可为空，即为填空题；</div>
             <div class="red--text">4.题目标题与内容必填；</div>
           </v-card-text>
+          <v-divider />
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="error darken-1" flat @click="downloadDialog = false">取消</v-btn>
@@ -270,38 +272,6 @@ export default {
     handleDownload() {
       this.downloadDialog = false;
       window.location.href = this.template;
-      // const templateJSON = [
-      //   {
-      //     题目标题: '',
-      //     题目内容: '',
-      //     选项一: '',
-      //     选项二: '',
-      //     选项三: '',
-      //     选项四: '',
-      //   },
-      // ];
-      // const cleanWorkbook = XLSX.utils.book_new();
-      // const worksheet = XLSX.utils.json_to_sheet(templateJSON);
-      // XLSX.utils.book_append_sheet(cleanWorkbook, worksheet, '模板');
-      // const stringToArrayBuffer = (string) => {
-      //   const buffer = new ArrayBuffer(string.length);
-      //   const view = new Uint8Array(buffer);
-      //   for (let i = 0; i !== string.length; ++i) {
-      //     view[i] = string.charCodeAt(i) & 0xff;
-      //   }
-      //   return buffer;
-      // };
-      // const ab = stringToArrayBuffer(
-      //   XLSX.write(cleanWorkbook, {
-      //     bookType: 'xlsx',
-      //     type: 'binary',
-      //   }),
-      // );
-      // const tmpDown = new Blob([ab], { type: '' });
-      // const a = document.createElement('a');
-      // a.href = URL.createObjectURL(tmpDown);
-      // a.download = 'template.xlsx';
-      // a.click();
     },
   },
 };

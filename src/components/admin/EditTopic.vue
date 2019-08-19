@@ -11,7 +11,7 @@
       v-model="dialog.isOpen"
       scrollable
       persistent
-      :width="openDialogType === dialog.type[1]? '50vw' : '300'"
+      :width="openDialogType === dialog.type[1]? '50vw' : '350'"
     >
       <v-card color="primary" dark v-if="openDialogType === dialog.type[0]">
         <v-card-text>提交中...
@@ -28,7 +28,7 @@
             :src="
               willDeleteIndex === -1
                 ? ''
-                : baseURL +topicGroups[activeTab].images[willDeleteIndex].url"
+                : baseURL + topicGroups[activeTab].images[willDeleteIndex].url"
             class="grey darken-4"
           ></v-img>
         </v-card-text>
@@ -75,32 +75,38 @@
         </v-card-actions>
       </v-card>
       <v-card v-else-if="openDialogType === dialog.type[4]">
-        <v-card-title>选项列表</v-card-title>
-        <v-divider></v-divider>
-        <v-card-text style="height: 300px;">
-          <template v-for="(option, index) in topicGroups[activeTab].options">
-            <v-text-field
-              v-model="topicGroups[activeTab].options[index]"
-              :key="index"
-              :disabled="!isEditing"
-              placeholder="选项"
-            >
-              <template v-slot:append>
-                <v-btn
-                  fab
-                  dark
-                  color="error"
-                  v-if="isEditing"
-                  @click="removeOption"
-                  :id="index"
-                  style="width: 30px; height: 30px;"
-                >
-                  <v-icon dark :id="index">remove</v-icon>
-                </v-btn>
-              </template>
-            </v-text-field>
-          </template>
-        </v-card-text>
+          <v-card-title>选项列表</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="height: 300px;" v-if="topicGroups[activeTab].options.length !== 0">
+            <template v-for="(option, index) in topicGroups[activeTab].options">
+              <v-text-field
+                v-model="topicGroups[activeTab].options[index]"
+                :key="index"
+                :disabled="!isEditing"
+                placeholder="选项"
+              >
+                <template v-slot:append>
+                  <v-btn
+                    fab
+                    dark
+                    color="error"
+                    v-if="isEditing"
+                    @click="removeOption"
+                    :id="index"
+                    style="width: 30px; height: 30px;"
+                  >
+                    <v-icon dark :id="index">remove</v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </template>
+          </v-card-text>
+          <v-card-text v-else style="height: 300px">
+            <div class="no-file">
+              <v-icon x-large style="margin-bottom: 1rem">speaker_notes_off</v-icon>
+              <span class="grey--text">这里空空如也，快给它加上选项吧~</span>
+            </div>
+          </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-btn flat color="primary" @click="addOption" v-if="isEditing">添加选项</v-btn>
@@ -230,10 +236,16 @@
                 ></v-text-field>
               </div>
               <v-btn
-                dark
+                color="black"
+                class="white--text"
+                :disabled="topic.options.length === 0 && !isEditing"
                 style="margin-bottom: 1rem"
                 @click.stop="dialog.isOpen = true; openDialogType = 'options';"
-              >{{isEditing? '修改选项' : '查看选项'}}</v-btn>
+              >
+              {{ topic.options.length === 0
+                  ? (isEditing ? '添加选项' :'填空题')
+                  : (isEditing? '修改选项' : '查看选项') }}
+              </v-btn>
             </v-card-title>
             <v-card-text
               class="grey--text topic-content"
@@ -299,7 +311,8 @@
                 </v-carousel-item>
               </v-carousel>
               <div class="no-file" v-else>
-                <div class="display-1">无</div>
+                <v-icon x-large style="margin-bottom: 1rem">link_off</v-icon>
+                <span class="grey--text">这道题还没有图片哦，给它添加一张吧~</span>
               </div>
             </v-card>
             <v-card class="cyan lighten-3 annex-groups">
@@ -352,7 +365,8 @@
                 </v-list-tile>
               </v-list>
               <div class="no-file" v-else>
-                <div class="display-1">无</div>
+                <v-icon x-large style="margin-bottom: 1rem">link_off</v-icon>
+                <span class="grey--text">这道题还没有附件哦，给它添加一个吧~</span>
               </div>
             </v-card>
           </div>
@@ -696,10 +710,11 @@ export default {
           margin-right 1rem
           .annex-show div
             width 100%
-        .no-file
-          background-color white
-          display flex
-          justify-content center
-          align-items center
-          height calc(100% - 48px)
+.no-file
+  background-color white
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  height calc(100% - 48px)
 </style>
