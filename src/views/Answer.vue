@@ -7,7 +7,7 @@
       <side-bar-item
         v-for="(item,index) in questionList"
         :key="index"
-        :text="item.title"
+        :text="item.title.slice(0,10)+'...'"
         :answered="Boolean(item.answer.option.length+item.answer.content.length)"
         :selected="selectedIndex === index"
         @click="selectedIndex = index"
@@ -90,24 +90,7 @@
           </v-card-actions>
         </v-card>
       </div>
-      <!-- <div class="answer-content-btn-container">
-        <v-btn
-          :disabled="selectedIndex === 0"
-          @click="handleQuestionSwitch(true)"
-          style="width: 300px"
-          large
-          color="#CFD8DC"
-        >上一题</v-btn>
-        <v-btn
-          :disabled="selectedIndex === questionList.length-1"
-          @click="handleQuestionSwitch(false)"
-          style="width:300px"
-          large
-          color="#CFD8DC"
-        >下一题</v-btn>
-      </div> -->
     </div>
-
   <v-dialog
       :value="showDone"
       max-width="290"
@@ -115,12 +98,9 @@
     >
       <v-card>
         <v-card-title class="headline">确认要提交交卷吗？</v-card-title>
-
         <v-card-text>是否确认要交卷？</v-card-text>
-
         <v-card-actions>
           <v-spacer></v-spacer>
-
           <v-btn
             color="error"
             text
@@ -128,28 +108,25 @@
           >
             取消
           </v-btn>
-
           <v-btn
             color="green"
             text
             style="color:white"
             @click="$router.push({name:'homepage'})"
           >
-            确认提交
+            确认交卷
           </v-btn>
         </v-card-actions>
       </v-card>
   </v-dialog>
   </div>
-  <v-card v-else class="loading-card" height="100%" width="100vw">
-    <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
-    <span class="grey--text">努力加载中......</span>
-  </v-card>
+  <loading v-else />
 </template>
 
 <script>
 import SideBarItem from '../components/answer/SideBarItem';
-import FabGroup from '../components/answer/FabGroup';
+import FabGroup from '../components/answer/fab/FabGroup';
+import Loading from '../components/common/Loading';
 import DebounceConstructor from '../utils/debounce.js';
 import { submit, baseURL } from '../api/index.js';
 
@@ -158,6 +135,7 @@ export default {
   components: {
     SideBarItem,
     FabGroup,
+    Loading,
   },
   methods: {
     newTab(target) {
@@ -181,11 +159,12 @@ export default {
     },
   },
   watch: {
-    selectedIndex() {
+    selectedIndex(newIndex, OldIndex) {
       if (this.$refs.content.classList) {
-        this.$refs.content.classList.remove('animated', 'fadeIn');
+        const direction = newIndex > OldIndex ? 'fadeInUp' : 'fadeInDown';
+        this.$refs.content.classList.remove('animated', 'fadeInUp', 'fadeInDown', 'faster');
         setTimeout(() => {
-          this.$refs.content.classList.add('animated', 'fadeIn');
+          this.$refs.content.classList.add('animated', direction, 'faster');
         });
       }
     },
@@ -230,14 +209,6 @@ export default {
 ::-webkit-scrollbar-thumb
   border-radius: 4px;
   background: #bbb;
-// ::-webkit-scrollbar-thumb:window-inactive
-//   background: rgba(255,0,0,0.4);
-
-.loading-card
-  display flex
-  flex-direction column
-  justify-content center
-  align-items center
 
 .answer-container
   display flex

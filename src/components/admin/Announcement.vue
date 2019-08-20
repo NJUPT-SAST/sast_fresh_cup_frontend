@@ -32,10 +32,10 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn color="success darken-1" flat @click="handleModify">确认修改</v-btn>
           <v-btn color="error darken-1" flat @click="openDialogType = 'delete'">删除</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click="dialog.isOpen = false">关闭</v-btn>
+          <!-- <v-btn color="blue darken-1" flat @click="dialog.isOpen = false">关闭</v-btn> -->
         </v-card-actions>
       </v-card>
       <v-card v-if="openDialogType === dialog.type[1]">
@@ -78,7 +78,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-toolbar color="cyan" dark tabs height="64px">
+    <v-toolbar color="blue" dark tabs height="64px">
       <v-icon>today</v-icon>
       <v-toolbar-title>公告板</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -117,7 +117,7 @@
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-card-title class="notice-title" v-on="on">
-                  <v-list dense class="cyan white--text">
+                  <v-list dense class="blue white--text">
                     <v-list-tile @click.stop="handleEditClick(index)" style="height: 52px">
                       <v-list-tile-content>
                         <v-list-tile-title class="title font-weight-light">{{ notice.title }}</v-list-tile-title>
@@ -296,8 +296,8 @@ export default {
 
 <style lang="stylus">
 .announcement
-  width 90%
-  height 600px
+  width 98%
+  height 95%
   // .loading-card
   // height calc(100% - 54px)
   .notice-container

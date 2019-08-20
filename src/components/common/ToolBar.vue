@@ -14,9 +14,9 @@
     <v-toolbar color="primary" height="80">
       <v-toolbar-title class="toolBar-title" @click="jump('homepage')">计算机基础知识竞赛</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-badge color="error" overlap>
+      <v-badge v-if="loginStatus" color="error" overlap>
         <template v-if="noticeCount" v-slot:badge>{{noticeCount}}</template>
-        <v-btn flat type="" @click="jump('notice')">
+        <v-btn flat type="" @click="showNotice = true">
           <div class="toolBar-btn">公告</div>
         </v-btn>
       </v-badge>
@@ -31,18 +31,24 @@
       <div @click="handleClickSnackbar" style="cursor: pointer">新公告</div>
       <v-btn flat dark text="" @click="showSnackbar = false">Close</v-btn>
     </v-snackbar>
+    <notice :showNotice="showNotice" @hideNotice="showNotice = false" />
   </div>
 </template>
 <script>
+import Notice from './Notice';
 import globalNotification from '@/utils/globalNotification';
 
 export default {
   name: 'ToolBar',
+  components: {
+    Notice,
+  },
   data() {
     return {
       showSnackbar: false,
       logoutDialog: false,
       timer: null,
+      showNotice: false,
     };
   },
   computed: {
@@ -57,6 +63,12 @@ export default {
     loginStatus: {
       handler: 'handleInterval',
       immediate: true,
+    },
+    noticeCount(newCount, oldCount) {
+      // 排除清零引起的公告数变化
+      if (newCount !== 0) {
+        globalNotification('新的公告', `您收到了${newCount - oldCount}条新公告`);
+      }
     },
   },
   methods: {

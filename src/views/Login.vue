@@ -72,7 +72,6 @@ export default {
         await this.$store.dispatch('init').then(() => {
           this.$store.commit('handleLoginStatus', true);
         });
-        this.btnLoading = false;
         if (isAdmin) {
           this.$router.push({ name: 'admin' });
         } else {
@@ -81,6 +80,7 @@ export default {
       } else {
         this.loginError = true;
       }
+      this.btnLoading = false;
     },
   },
 };
