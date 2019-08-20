@@ -1,13 +1,7 @@
 <template>
   <div class="admin-container">
-    <v-card class="loading-card" v-if="isIniting" height="100%" width="100vw">
-      <v-progress-circular size="80" color="primary" indeterminate style="margin-bottom: 2rem"/>
-      <span class="grey--text">努力加载中......</span>
-    </v-card>
-    <v-card class="loading-card" v-show="!isInitSuccess && !isIniting" height="100%" width="100vw">
-      <v-icon x-large style="margin-bottom: 2rem" color="error">error</v-icon>
-      <span class="grey--text">加载失败，请刷新页面重试！</span>
-    </v-card>
+    <loading v-if="isIniting" />
+    <load-error v-show="!isInitSuccess && !isIniting" />
     <div v-show="isInitSuccess && !isIniting" class="admin">
       <v-navigation-drawer
         clipped
@@ -16,60 +10,49 @@
         class="elevation-2"
       >
         <v-list dense>
-          <v-list-tile @click="changeStatus('announcement')">
-            <v-list-tile-action>
-              <v-icon>today</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title style="letter-spacing: 2px">公告板</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-divider></v-divider>
-          <v-list-tile @click="changeStatus('setMatchTime')">
-            <v-list-tile-action>
-              <v-icon>access_alarm</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title style="letter-spacing: 2px">比赛结束时间设置</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-divider></v-divider>
-          <v-list-tile @click="changeStatus('addTopic')">
-            <v-list-tile-action>
-              <v-icon>add_circle_outline</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title style="letter-spacing: 2px">题目添加</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-divider></v-divider>
-          <v-list-tile @click="changeStatus('editTopic')">
-            <v-list-tile-action>
-              <v-icon>edit</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title style="letter-spacing: 2px">题目编辑</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-divider></v-divider>
+          <div
+            v-for="(navigationItem,index) in navigationItems"
+            :key="index"
+          >
+            <v-list-tile @click="changeComponent(navigationItem.component)">
+              <v-list-tile-action>
+                <v-icon>{{navigationItem.icon}}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title style="letter-spacing: 2px">
+                  {{navigationItem.name}}
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-divider></v-divider>
+          </div>
         </v-list>
       </v-navigation-drawer>
       <div class="detail">
-        <template v-if="status === ''">欢迎，点击左侧菜单进行操作</template>
-        <announcement v-if="status === 'announcement'"/>
-        <set-match-time v-else-if="status === 'setMatchTime'"/>
-        <add-topic v-else-if="status === 'addTopic'"/>
-        <edit-topic v-else-if="status === 'editTopic'"/>
+        <keep-alive>
+          <component :is="activeComponent" />
+        </keep-alive>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Vue from 'vue';
 import Announcement from '../components/admin/Announcement';
 import SetMatchTime from '../components/admin/SetMatchTime';
 import AddTopic from '../components/admin/AddTopic';
 import EditTopic from '../components/admin/EditTopic';
+import Loading from '../components/common/Loading';
+import LoadError from '../components/common/LoadError';
+
+const AdminWelcome = Vue.extend({
+  render(h) {
+    return (
+      <div>欢迎，点击左侧菜单进行操作</div>
+    );
+  },
+});
 
 export default {
   components: {
@@ -77,15 +60,40 @@ export default {
     SetMatchTime,
     AddTopic,
     EditTopic,
+    Loading,
+    LoadError,
+    AdminWelcome,
   },
   data: () => ({
-    status: '',
     isIniting: false,
     isInitSuccess: false,
+    activeComponent: AdminWelcome,
+    navigationItems: [
+      {
+        name: '公告板',
+        icon: 'today',
+        component: Announcement,
+      },
+      {
+        name: '比赛结束时间设置',
+        icon: 'access_alarm',
+        component: SetMatchTime,
+      },
+      {
+        name: '题目添加',
+        icon: 'add_circle_outline',
+        component: AddTopic,
+      },
+      {
+        name: '题目编辑',
+        icon: 'edit',
+        component: EditTopic,
+      },
+    ],
   }),
   methods: {
-    changeStatus(status) {
-      this.status = status;
+    changeComponent(newComponent) {
+      this.activeComponent = newComponent;
     },
   },
   async mounted() {
@@ -108,11 +116,6 @@ export default {
 <style lang="stylus">
 .admin-container
   height calc(100vh - 80px)
-  .loading-card
-    display flex
-    flex-direction column
-    justify-content center
-    align-items center
   .admin
     height 100%
     display flex

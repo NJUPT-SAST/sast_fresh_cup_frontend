@@ -80,7 +80,7 @@
         <v-tabs
           v-model="activeTab"
           color="primary"
-          slider-color="yellow"
+          slider-color="white"
           dark
           style="width: 100%"
           show-arrows

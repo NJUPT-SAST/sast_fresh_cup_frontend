@@ -134,7 +134,7 @@
       @change="handleAddFile"
       style="width: 0; height: 0; display: none"
     >
-    <v-toolbar color="cyan" dark tabs height="64px">
+    <v-toolbar color="blue" dark tabs height="64px">
       <v-tooltip right>
         <template v-slot:activator="{ on }">
           <v-btn icon @click="isSearchClick = !isSearchClick;" v-on="on" v-if="!isEditing">
@@ -195,8 +195,8 @@
         <span>取消修改</span>
       </v-tooltip>
       <template v-slot:extension>
-        <v-tabs v-model="activeTab" color="cyan" show-arrows grow>
-          <v-tabs-slider color="yellow"></v-tabs-slider>
+        <v-tabs v-model="activeTab" color="blue" show-arrows grow>
+          <v-tabs-slider color="blue"></v-tabs-slider>
           <v-tab
             v-for="(topic, index) in topicGroups"
             :key="index"
@@ -262,7 +262,7 @@
             </v-card-text>
           </div>
           <div class="file-part">
-            <v-card color="cyan lighten-3" class="img-groups">
+            <v-card color="blue lighten-3" class="img-groups">
               <v-card-title style="padding: 0; padding-left: 1rem; height: 48px">
                 <div class="title white--text">图片</div>
                 <v-spacer/>
@@ -315,7 +315,7 @@
                 <span class="grey--text">这道题还没有图片哦，给它添加一张吧~</span>
               </div>
             </v-card>
-            <v-card class="cyan lighten-3 annex-groups">
+            <v-card class="blue lighten-3 annex-groups">
               <v-card-title style="padding: 0; margin-left: 1rem; height: 48px">
                 <div class="title white--text">附件</div>
                 <v-spacer/>
@@ -380,36 +380,52 @@
 import {
   modifyQuestions, deleteQuestions, addSource, deleteSource, baseURL,
 } from '@/api/index';
+import DebounceConstructor from '@/utils/debounce.js';
 
 export default {
-  data: () => ({
-    isSnackBarShow: false,
-    isSuccess: false,
-    isSearchClick: false,
-    isEditing: false,
-    isGettingQuestions: false,
-    isGetQuestionsSuccess: false,
-    dialog: {
-      type: ['checking', 'deleteImage', 'deleteAnnex', 'deleteTopic', 'options'],
-      isOpen: false,
-    },
-    openDialogType: '',
-    // 目前选中的题目的选项卡，也是选中的题目的索引
-    activeTab: 0,
-    // 即将删除的文件索引
-    willDeleteIndex: -1,
-    baseURL,
-    successMsg: '',
-    errMsg: '',
-    // 正在搜索
-    isSearching: false,
-    // 搜索到的内容，显示在下拉框
-    searchItems: [],
-    // 搜索框输入的内容
-    searchContent: '',
-    // 在下拉框中选择的项
-    selectItem: '',
-  }),
+  data() {
+    // 使用了防抖函数，避免频繁输入时引起的卡顿，优化体验
+    const {
+      Debounce: handleTyping,
+    } = DebounceConstructor((val) => {
+      console.log(val);
+      if (val) {
+        if (val !== this.selectItem) {
+          this.handleSearch(val);
+        }
+      }
+    }, 400);
+
+    return {
+      isSnackBarShow: false,
+      isSuccess: false,
+      isSearchClick: false,
+      isEditing: false,
+      isGettingQuestions: false,
+      isGetQuestionsSuccess: false,
+      dialog: {
+        type: ['checking', 'deleteImage', 'deleteAnnex', 'deleteTopic', 'options'],
+        isOpen: false,
+      },
+      openDialogType: '',
+      // 目前选中的题目的选项卡，也是选中的题目的索引
+      activeTab: 0,
+      // 即将删除的文件索引
+      willDeleteIndex: -1,
+      successMsg: '',
+      errMsg: '',
+      // 正在搜索
+      isSearching: false,
+      // 搜索到的内容，显示在下拉框
+      searchItems: [],
+      // 搜索框输入的内容
+      searchContent: '',
+      // 在下拉框中选择的项
+      selectItem: '',
+      baseURL,
+      handleTyping,
+    };
+  },
   computed: {
     // 获取题目后的题目数组
     topicGroups() {
@@ -423,11 +439,7 @@ export default {
   watch: {
     // 搜索内容改变则开始检索
     searchContent(val) {
-      if (val) {
-        if (val !== this.selectItem) {
-          this.handleSearch(val);
-        }
-      }
+      this.handleTyping(val);
     },
     // 点击搜索项后跳转到那道题
     selectItem(val) {
