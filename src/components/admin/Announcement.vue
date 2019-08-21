@@ -120,7 +120,9 @@
                   <v-list dense class="blue white--text">
                     <v-list-tile @click.stop="handleEditClick(index)" style="height: 52px">
                       <v-list-tile-content>
-                        <v-list-tile-title class="title font-weight-light">{{ notice.title }}</v-list-tile-title>
+                        <v-list-tile-title class="title font-weight-light">
+                          {{ notice.title }}
+                        </v-list-tile-title>
                       </v-list-tile-content>
                     </v-list-tile>
                   </v-list>

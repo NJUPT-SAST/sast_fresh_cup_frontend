@@ -91,34 +91,10 @@
         </v-card>
       </div>
     </div>
-  <v-dialog
-      :value="showDone"
-      max-width="290"
-      persistent
-    >
-      <v-card>
-        <v-card-title class="headline">确认要提交交卷吗？</v-card-title>
-        <v-card-text>是否确认要交卷？</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="error"
-            text
-            @click="showDone = false"
-          >
-            取消
-          </v-btn>
-          <v-btn
-            color="green"
-            text
-            style="color:white"
-            @click="$router.push({name:'homepage'})"
-          >
-            确认交卷
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-  </v-dialog>
+    <hand-in-dialog
+      :showDone="showDone"
+      @handleClose="showDone = false"
+    />
   </div>
   <loading v-else />
 </template>
@@ -126,6 +102,7 @@
 <script>
 import SideBarItem from '../components/answer/SideBarItem';
 import FabGroup from '../components/answer/fab/FabGroup';
+import HandInDialog from '../components/answer/HandInDialog';
 import Loading from '../components/common/Loading';
 import DebounceConstructor from '../utils/debounce.js';
 import { submit, baseURL } from '../api/index.js';
@@ -136,6 +113,7 @@ export default {
     SideBarItem,
     FabGroup,
     Loading,
+    HandInDialog,
   },
   methods: {
     newTab(target) {
