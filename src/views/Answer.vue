@@ -21,75 +21,11 @@
         @handleDown="handleQuestionSwitch(false)"
         @handleDone="showDone = true"
       />
-      <div ref="content">
-        <v-card class="answer-content-card">
-          <v-card-title class="answer-content-card-title">
-            {{questionList[selectedIndex].title}}
-          </v-card-title>
-          <v-card-text class="answer-content-card-text">
-            {{questionList[selectedIndex].content}}
-            <div
-              class="answer-content-card-img-container"
-              v-if="questionList[selectedIndex].images.length"
-            >
-              <img
-                class="answer-content-card-img elevation-1"
-                v-for="(item,index) in questionList[selectedIndex].images"
-                :src="baseURL + item.url"
-                :key="index"
-                :alt="item.name"
-                @click="newTab(baseURL + item.url)"
-              >
-            </div>
-            <div
-              class="answer-content-card-attachment"
-              v-if="questionList[selectedIndex].attachments.length"
-            >
-              <v-btn
-                v-for="(item,index) in questionList[selectedIndex].attachments"
-                :key="index"
-                @click="newTab(baseURL+item.url)"
-                color="#90CAF9"
-                style="color:white"
-              >
-                {{item.name}}
-              </v-btn>
-            </div>
-          </v-card-text>
-        </v-card>
-        <v-card class="answer-content-card">
-          <v-textarea
-            outlined
-            label="请填写答案"
-            rows="10"
-            no-resize
-            :value="questionList[selectedIndex].answer.content"
-            @input="handleValueChange"
-            v-if="!questionList[selectedIndex].options.length"
-            class="answer-content-card-textarea"
-          ></v-textarea>
-          <v-radio-group
-            v-else
-            :mandatory="false"
-            @change="handleValueChange"
-            :value="questionList[selectedIndex].answer.content"
-          >
-            <v-radio
-              v-for="(option,index) in questionList[selectedIndex].options"
-              :key="index"
-              :label="option"
-              :value="option"
-            ></v-radio>
-          </v-radio-group>
-          <v-card-actions class="answer-content-card-action">
-            <v-btn
-              color="grey"
-              style="margin-right:40px;color:white"
-              @click.stop="handleValueChange('')"
-            >重置</v-btn>
-          </v-card-actions>
-        </v-card>
-      </div>
+      <answer-content
+        :questionList="questionList"
+        :selectedIndex="selectedIndex"
+        :handleTyping="handleTyping"
+       />
     </div>
     <hand-in-dialog
       :showDone="showDone"
@@ -100,12 +36,13 @@
 </template>
 
 <script>
-import SideBarItem from '../components/answer/SideBarItem';
-import FabGroup from '../components/answer/fab/FabGroup';
-import HandInDialog from '../components/answer/HandInDialog';
-import Loading from '../components/common/Loading';
-import DebounceConstructor from '../utils/debounce.js';
-import { submit, baseURL } from '../api/index.js';
+import SideBarItem from '@/components/answer/SideBarItem';
+import FabGroup from '@/components/answer/fab/FabGroup';
+import HandInDialog from '@/components/answer/HandInDialog';
+import Loading from '@/components/common/Loading';
+import AnswerContent from '@/components/answer/AnswerContent';
+import DebounceConstructor from '@/utils/debounce.js';
+import { submit, baseURL } from '@/api/index.js';
 
 export default {
   name: 'Answer',
@@ -114,36 +51,15 @@ export default {
     FabGroup,
     Loading,
     HandInDialog,
+    AnswerContent
   },
   methods: {
-    newTab(target) {
-      window.open(target, '_blank');
-    },
-    handleValueChange(e) {
-      this.$store.commit({
-        type: 'handleAnswerChange',
-        value: e,
-        index: this.selectedIndex,
-      });
-      this.handleTyping(e);
-    },
     handleQuestionSwitch(isUp = true) {
       this.handleExecute();
       if (isUp) {
         this.selectedIndex--;
       } else {
         this.selectedIndex++;
-      }
-    },
-  },
-  watch: {
-    selectedIndex(newIndex, OldIndex) {
-      if (this.$refs.content.classList) {
-        const direction = newIndex > OldIndex ? 'fadeInUp' : 'fadeInDown';
-        this.$refs.content.classList.remove('animated', 'fadeInUp', 'fadeInDown', 'faster');
-        setTimeout(() => {
-          this.$refs.content.classList.add('animated', direction, 'faster');
-        });
       }
     },
   },
@@ -162,7 +78,6 @@ export default {
     return {
       handleTyping,
       handleExecute,
-      baseURL,
       selectedIndex: 0,
       showDone: false,
     };
@@ -233,12 +148,4 @@ export default {
       .answer-content-card-action
         display flex
         justify-content flex-start
-    .answer-content-btn-container
-      display flex
-      margin 0 auto
-      width 70%
-      padding-left 20px
-      padding-right 20px
-      justify-content space-between
-      margin-top 20px
 </style>

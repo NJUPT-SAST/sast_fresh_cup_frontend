@@ -21,9 +21,11 @@ export default {
     Footer,
   },
   async mounted() {
-    window.api = api;
-    window.store = this.$store;
-    // 这两行代码是测试使用的
+    if(process.env.NODE_ENV === "development"){
+      window.api = api;
+      window.store = this.$store;
+      // 这两行代码是开发环境使用的
+    }
   },
 };
 </script>

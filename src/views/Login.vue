@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { login, userinfo } from '../api/index';
+import { login, userinfo } from '@/api/index';
 
 export default {
   data: () => ({

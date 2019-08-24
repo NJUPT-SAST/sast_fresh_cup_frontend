@@ -126,7 +126,7 @@
 <script>
 import XLSX from 'xlsx';
 import { modifyQuestions, modifyQuestionsMassively } from '@/api/index';
-import template from '../../assets/template.xlsx';
+import template from '@/assets/template.xlsx';
 
 export default {
   data: () => ({

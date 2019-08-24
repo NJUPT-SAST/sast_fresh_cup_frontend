@@ -39,20 +39,13 @@
 
 <script>
 import Vue from 'vue';
-import Announcement from '../components/admin/Announcement';
-import SetMatchTime from '../components/admin/SetMatchTime';
-import AddTopic from '../components/admin/AddTopic';
-import EditTopic from '../components/admin/EditTopic';
-import Loading from '../components/common/Loading';
-import LoadError from '../components/common/LoadError';
-
-const AdminWelcome = Vue.extend({
-  render(h) {
-    return (
-      <div>欢迎，点击左侧菜单进行操作</div>
-    );
-  },
-});
+import Announcement from '@/components/admin/Announcement';
+import SetMatchTime from '@/components/admin/SetMatchTime';
+import AddTopic from '@/components/admin/AddTopic';
+import EditTopic from '@/components/admin/EditTopic';
+import Loading from '@/components/common/Loading';
+import LoadError from '@/components/common/LoadError';
+import AdminWelcome from '@/components/admin/AdminWelcome';
 
 export default {
   components: {
@@ -97,18 +90,23 @@ export default {
     },
   },
   async mounted() {
-    this.isIniting = true;
-    await this.$store
-      .dispatch('init')
-      .then(() => {
-        this.isInitSuccess = true;
-      })
-      .catch(() => {
-        this.isInitSuccess = false;
-      })
-      .finally(() => {
-        this.isIniting = false;
-      });
+    if(this.$store.state.userinfo.isAdmin){
+      this.isIniting = true;
+      await this.$store
+        .dispatch('init')
+        .then(() => {
+          this.isInitSuccess = true;
+        })
+        .catch(() => {
+          this.isInitSuccess = false;
+        })
+        .finally(() => {
+          this.isIniting = false;
+        });
+    }
+    else{
+      this.$router.go(-1);
+    }
   },
 };
 </script>

@@ -20,7 +20,7 @@
             color="green"
             text
             style="color:white"
-            @click="$router.push({name:'homepage'})"
+            @click="handleLogout"
           >
             确认交卷
           </v-btn>
@@ -37,5 +37,11 @@ export default {
       default: () => false,
     },
   },
+  methods:{
+    handleLogout(){
+      localStorage.removeItem('fresh_cup_token');
+      this.$router.push({name:'homepage'});
+    }
+  }
 };
 </script>
