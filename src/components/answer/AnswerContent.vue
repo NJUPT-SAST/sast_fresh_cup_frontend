@@ -4,8 +4,10 @@
       <v-card-title class="answer-content-card-title">
         {{questionList[selectedIndex].title}}
       </v-card-title>
-      <v-card-text class="answer-content-card-text">
-        {{questionList[selectedIndex].content}}
+      <v-card-text class="answer-content-card-text"
+        v-html="marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))"
+      >
+        {{marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))}}
         <div
           class="answer-content-card-img-container"
           v-if="questionList[selectedIndex].images.length"
@@ -70,25 +72,27 @@
   </div>
 </template>
 <script>
-import {baseURL} from '@/api/index.js';
+import marked from 'marked';
+import { baseURL } from '@/api/index.js';
+
 
 export default {
-  name:'AnswerContent',
-  props:{
-    questionList:{
-      type:Array,
-      default:() => []
+  name: 'AnswerContent',
+  props: {
+    questionList: {
+      type: Array,
+      default: () => [],
     },
-    selectedIndex:{
-      type:Number,
-      default:() => 0
+    selectedIndex: {
+      type: Number,
+      default: () => 0,
     },
-    handleTyping:{
-      type:Function,
-      default:() => () =>{}
-    }
+    handleTyping: {
+      type: Function,
+      default: () => () => {},
+    },
   },
-  methods:{
+  methods: {
     newTab(target) {
       window.open(target, '_blank');
     },
@@ -100,8 +104,9 @@ export default {
       });
       this.handleTyping(e);
     },
+    marked,
   },
-  data(){
+  data() {
     return {
       baseURL,
     };
@@ -116,8 +121,8 @@ export default {
         });
       }
     },
-  }
-}
+  },
+};
 </script>
 <style lang="stylus">
 .answer-content-card

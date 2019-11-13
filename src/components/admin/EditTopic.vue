@@ -251,7 +251,8 @@
               class="grey--text topic-content"
               v-if="!isEditing"
               style="padding-top: 0"
-            >{{topic.content}}</v-card-text>
+              v-html="marked(topic.content.replace(/\n/g,'\n\n'))"
+            >{{marked(topic.content.replace(/\n/g,'\n\n'))}}</v-card-text>
             <v-card-text v-else-if="isEditing" style="padding-top: 0">
               <v-textarea
                 placeholder="题目内容"
@@ -377,6 +378,7 @@
 </template>
 
 <script>
+import marked from 'marked';
 import {
   modifyQuestions, deleteQuestions, addSource, deleteSource, baseURL,
 } from '@/api/index';
@@ -602,6 +604,7 @@ export default {
           this.willDeleteIndex = -1;
         });
     },
+    marked,
   },
 };
 </script>
