@@ -59,11 +59,11 @@ export default {
   computed: {
     total() {
       const { start, end } = this.$store.state.due;
-      return parseInt((end - start) / 60000);
+      return parseInt((end - start) / 60);
     },
     rest() {
       const { end } = this.$store.state.due;
-      return Math.max(parseInt((end - Date.now()) / 60000), 0);
+      return Math.max(parseInt((end - Date.now() / 1000) / 60), 0);
     },
   },
   props: {
