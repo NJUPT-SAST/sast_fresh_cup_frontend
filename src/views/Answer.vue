@@ -42,7 +42,7 @@ import HandInDialog from '@/components/answer/HandInDialog';
 import Loading from '@/components/common/Loading';
 import AnswerContent from '@/components/answer/AnswerContent';
 import DebounceConstructor from '@/utils/debounce.js';
-import { submit, baseURL } from '@/api/index.js';
+import { submit } from '@/api/index.js';
 
 export default {
   name: 'Answer',
@@ -51,7 +51,7 @@ export default {
     FabGroup,
     Loading,
     HandInDialog,
-    AnswerContent
+    AnswerContent,
   },
   methods: {
     handleQuestionSwitch(isUp = true) {

@@ -37,11 +37,11 @@ export default {
       default: () => false,
     },
   },
-  methods:{
-    handleLogout(){
+  methods: {
+    handleLogout() {
       localStorage.removeItem('fresh_cup_token');
-      this.$router.push({name:'homepage'});
-    }
-  }
+      this.$router.push({ name: 'homepage' });
+    },
+  },
 };
 </script>

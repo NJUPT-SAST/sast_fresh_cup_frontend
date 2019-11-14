@@ -21,9 +21,9 @@ module.exports = {
     indent: [2, 2],
     'linebreak-style': 'off',
     'no-nested-ternary': 'off',
-    'radix':'off',
-    'no-plusplus':'off',
-    'no-param-reassign':'off'
+    radix: 'off',
+    'no-plusplus': 'off',
+    'no-param-reassign': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint',

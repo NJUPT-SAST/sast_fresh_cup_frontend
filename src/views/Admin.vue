@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import Announcement from '@/components/admin/Announcement';
 import SetMatchTime from '@/components/admin/SetMatchTime';
 import AddTopic from '@/components/admin/AddTopic';
@@ -90,7 +89,7 @@ export default {
     },
   },
   async mounted() {
-    if(this.$store.state.userinfo.isAdmin){
+    if (this.$store.state.userinfo.isAdmin) {
       this.isIniting = true;
       await this.$store
         .dispatch('init')
@@ -103,8 +102,7 @@ export default {
         .finally(() => {
           this.isIniting = false;
         });
-    }
-    else{
+    } else {
       this.$router.go(-1);
     }
   },

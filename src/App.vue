@@ -21,7 +21,7 @@ export default {
     Footer,
   },
   async mounted() {
-    if(process.env.NODE_ENV === "development"){
+    if (process.env.NODE_ENV === 'development') {
       window.api = api;
       window.store = this.$store;
       // 这两行代码是开发环境使用的
