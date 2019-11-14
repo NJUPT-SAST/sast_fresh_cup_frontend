@@ -66,7 +66,7 @@ export default {
     },
     noticeCount(newCount, oldCount) {
       // 排除清零引起的公告数变化
-      if (newCount !== 0) {
+      if (newCount !== 0 && (newCount - oldCount > 0)) {
         globalNotification('新的公告', `您收到了${newCount - oldCount}条新公告`);
       }
     },
