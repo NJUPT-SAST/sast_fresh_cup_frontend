@@ -102,7 +102,7 @@ export default {
         value: e,
         index: this.selectedIndex,
       });
-      this.handleTyping(e);
+      this.handleTyping(e, this.selectedIndex);
     },
     marked,
   },

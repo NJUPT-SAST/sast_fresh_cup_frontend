@@ -71,9 +71,9 @@ export default {
   data() {
     const {
       Debounce: handleTyping, Clear: handleExecute,
-    } = DebounceConstructor((val) => {
-      submit(this.questionList[this.selectedIndex].id, val);
-      this.$store.commit('handleAnswerChange', { value: val, index: this.selectedIndex });
+    } = DebounceConstructor((val, index) => {
+      submit(this.questionList[index].id, val);
+      this.$store.commit('handleAnswerChange', { value: val, index });
     }, 800);
     return {
       handleTyping,
