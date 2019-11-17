@@ -28,7 +28,7 @@
       </v-btn>
     </v-toolbar>
     <v-snackbar v-model="showSnackbar" :timeout="4000" bottom color="#0D47A1" style="bottom: 10px">
-      <div @click="handleClickSnackbar" style="cursor: pointer">新公告</div>
+      <div @click="handleClickSnackbar" style="cursor: pointer">发现新公告</div>
       <v-btn flat dark text="" @click="showSnackbar = false">Close</v-btn>
     </v-snackbar>
     <notice :showNotice="showNotice" @hideNotice="showNotice = false" />
@@ -67,6 +67,7 @@ export default {
     noticeCount(newCount, oldCount) {
       // 排除清零引起的公告数变化
       if (newCount !== 0 && (newCount - oldCount > 0)) {
+        this.showSnackbar = true;
         globalNotification('新的公告', `您收到了${newCount - oldCount}条新公告`);
       }
     },
@@ -95,7 +96,7 @@ export default {
       if (this.loginStatus) {
         this.timer = setInterval(() => {
           this.$store.dispatch('update');
-        }, 10000);
+        }, 15000);
       } else {
         // 登录状态为false时清理定时
         clearInterval(this.timer);
