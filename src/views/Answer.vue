@@ -7,7 +7,8 @@
       <side-bar-item
         v-for="(item,index) in questionList"
         :key="index"
-        :text="item.title.slice(0,10)+'...'"
+        :sequence="index+1"
+        :text="item.title.length <=10 ? item.title: item.title.slice(0,10)+'...'"
         :answered="Boolean(item.answer.option.length+item.answer.content.length)"
         :selected="selectedIndex === index"
         @click="selectedIndex = index"

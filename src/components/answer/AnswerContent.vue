@@ -2,7 +2,7 @@
   <div ref="content">
     <v-card class="answer-content-card">
       <v-card-title class="answer-content-card-title">
-        {{questionList[selectedIndex].title}}
+        {{selectedIndex +1}}. {{questionList[selectedIndex].title}}
       </v-card-title>
       <v-card-text class="answer-content-card-text"
         v-html="marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))"

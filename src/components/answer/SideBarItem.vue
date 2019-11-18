@@ -12,7 +12,7 @@
     <div
       class="side-bar-item-text"
       :style="{color: answered ? 'white' : 'black' }"
-    >{{text}}</div>
+    >{{sequence}}. {{text}}</div>
   </v-sheet>
 </template>
 <script>
@@ -35,6 +35,10 @@ export default {
     selected: {
       type: Boolean,
       default: () => false,
+    },
+    sequence: {
+      type: Number,
+      default: () => 0,
     },
   },
   methods: {
@@ -73,7 +77,8 @@ export default {
   cursor pointer
   display flex
   user-select none
-  justify-content center
+  padding-left 10%
+  justify-content flex-start
   align-items center
   .side-bar-item-text
     font-size 18px
