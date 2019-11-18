@@ -251,8 +251,8 @@
               class="grey--text topic-content"
               v-if="!isEditing"
               style="padding-top: 0"
-              v-html="marked(topic.content.replace(/\n/g,'\n\n'))"
-            >{{marked(topic.content.replace(/\n/g,'\n\n'))}}</v-card-text>
+              v-html="marked(topic.content)"
+            >{{marked(topic.content)}}</v-card-text>
             <v-card-text v-else-if="isEditing" style="padding-top: 0">
               <v-textarea
                 placeholder="题目内容"
@@ -379,6 +379,8 @@
 
 <script>
 import marked from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 import {
   modifyQuestions, deleteQuestions, addSource, deleteSource, baseURL,
 } from '@/api/index';
@@ -452,6 +454,20 @@ export default {
     },
   },
   async mounted() {
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      highlight(code) {
+        return hljs.highlightAuto(code).value;
+      },
+      pedantic: false,
+      gfm: true,
+      tables: true,
+      breaks: true,
+      sanitize: false,
+      smartLists: true,
+      smartypants: true,
+      xhtml: false,
+    });
     this.isGettingQuestions = true;
     await this.$store
       .dispatch('update')

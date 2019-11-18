@@ -2,11 +2,11 @@
   <div ref="content">
     <v-card class="answer-content-card">
       <v-card-title class="answer-content-card-title">
-        {{selectedIndex +1}}. {{questionList[selectedIndex].title}}
+        {{title}}
       </v-card-title>
       <v-card-text class="answer-content-card-text">
-        <div v-html="marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))">
-          {{marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))}}
+        <div v-html="content">
+          {{content}}
         </div>
         <div
           class="answer-content-card-img-container"
@@ -73,6 +73,8 @@
 </template>
 <script>
 import marked from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 import { baseURL } from '@/api/index.js';
 
 
@@ -90,6 +92,14 @@ export default {
     handleTyping: {
       type: Function,
       default: () => () => {},
+    },
+  },
+  computed: {
+    title() {
+      return `${this.selectedIndex + 1}. ${this.questionList[this.selectedIndex].title}`;
+    },
+    content() {
+      return marked(this.questionList[this.selectedIndex].content);
     },
   },
   methods: {
@@ -122,6 +132,22 @@ export default {
       }
     },
   },
+  mounted() {
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      highlight(code) {
+        return hljs.highlightAuto(code).value;
+      },
+      pedantic: false,
+      gfm: true,
+      tables: true,
+      breaks: true,
+      sanitize: false,
+      smartLists: true,
+      smartypants: true,
+      xhtml: false,
+    });
+  },
 };
 </script>
 <style lang="stylus">
@@ -135,8 +161,8 @@ export default {
   .answer-content-card-title
     user-select none
     font-size 36px
-  .answer-content-card-text
-    font-size 18px
+  // .answer-content-card-text
+  //   font-size 18px
   .answer-content-card-img-container
     margin 0 auto
     display flex
