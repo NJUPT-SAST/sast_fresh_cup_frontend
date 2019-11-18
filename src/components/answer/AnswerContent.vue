@@ -4,10 +4,10 @@
       <v-card-title class="answer-content-card-title">
         {{selectedIndex +1}}. {{questionList[selectedIndex].title}}
       </v-card-title>
-      <v-card-text class="answer-content-card-text"
-        v-html="marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))"
-      >
-        {{marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))}}
+      <v-card-text class="answer-content-card-text">
+        <div v-html="marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))">
+          {{marked(questionList[selectedIndex].content.replace(/\n/g,'\n\n'))}}
+        </div>
         <div
           class="answer-content-card-img-container"
           v-if="questionList[selectedIndex].images.length"
@@ -141,6 +141,7 @@ export default {
     margin 0 auto
     display flex
     flex-wrap wrap
+    padding-top 20px
     .answer-content-card-img
       cursor pointer
       width 40%
