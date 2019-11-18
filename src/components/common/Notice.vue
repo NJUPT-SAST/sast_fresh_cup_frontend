@@ -68,7 +68,7 @@ export default {
   .notice-container{
     padding:80px 0 80px 0;
     background-color: white;
-    height: auto;
+    height: 100%;
   }
   .notice-card{
     max-width:800px;

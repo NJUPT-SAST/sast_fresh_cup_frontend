@@ -58,6 +58,13 @@ export default {
     loginStatus() {
       return this.$store.state.loginStatus;
     },
+    isAdmin() {
+      try {
+        return this.$store.state.userinfo.isAdmin !== 0;
+      } catch (e) {
+        return false;
+      }
+    },
   },
   watch: {
     loginStatus: {
@@ -65,10 +72,28 @@ export default {
       immediate: true,
     },
     noticeCount(newCount, oldCount) {
-      // 排除清零引起的公告数变化
-      if (newCount !== 0 && (newCount - oldCount > 0)) {
+      // 排除清零引起的公告数变化 , 并且登录管理员账号时不发出通知弹窗
+      if (newCount !== 0 && (newCount - oldCount > 0) && !this.isAdmin) {
         this.showSnackbar = true;
         globalNotification('新的公告', `您收到了${newCount - oldCount}条新公告`);
+      }
+    },
+    $route(value) {
+      if (localStorage.getItem('fresh_cup_token')) {
+        const { name } = value;
+        if (name === 'admin') {
+          if (!this.isAdmin) {
+            this.$router.push({ name: 'admin' });
+          }
+        } else if (name === 'answer') {
+          if (this.isAdmin) {
+            this.$router.push({ name: 'answer' });
+          }
+        } else {
+          this.$router.push({ name: 'login' });
+        }
+      } else {
+        this.$router.push({ name: 'login' });
       }
     },
   },
@@ -102,11 +127,6 @@ export default {
         clearInterval(this.timer);
       }
     },
-  },
-  mounted() {
-    if (!localStorage.getItem('fresh_cup_token')) {
-      this.$router.push({ name: 'login' });
-    }
   },
 };
 </script>

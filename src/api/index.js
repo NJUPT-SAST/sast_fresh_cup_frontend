@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const baseURL = process.env.VUE_APP_API_REQUEST_URL || 'https://contestease.wyzwb.com'; // 开发环境地址
-const clientSecret = 'lDCcVZDe8aPgBKK2Z3FfUXUMDHLXBj49GVB4ArkA';
+const clientSecret = process.env.VUE_APP_API_SECRET || 'lDCcVZDe8aPgBKK2Z3FfUXUMDHLXBj49GVB4ArkA'; // 密钥
 
 let instance = axios.create({
   baseURL: `${baseURL}/api`,
