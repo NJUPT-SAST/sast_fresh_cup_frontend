@@ -12,7 +12,7 @@
       </v-card>
     </v-dialog>
     <v-toolbar color="primary" height="80">
-      <v-toolbar-title class="toolBar-title" @click="jump('homepage')">计算机基础知识竞赛</v-toolbar-title>
+      <v-toolbar-title class="toolBar-title" @click="jump('homepage')">"新柚杯"计算机基础知识竞赛</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-badge v-if="loginStatus" color="error" overlap>
         <template v-if="noticeCount" v-slot:badge>{{noticeCount}}</template>
