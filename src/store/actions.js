@@ -52,8 +52,8 @@ export default {
       hash: { problemsMd5: oldProblemMd5, noticesMd5: oldNoticeMd5 },
     } = state;
 
-    if (problemsMd5 !== oldProblemMd5) requestList.push(getQuestions);
-    if (noticesMd5 !== oldNoticeMd5) requestList.push(getNotice);
+    if (problemsMd5 === '' || problemsMd5 !== oldProblemMd5) requestList.push(getQuestions);
+    if (noticesMd5 === '' || noticesMd5 !== oldNoticeMd5) requestList.push(getNotice);
     if (name !== oldName) newState.name = name;
     if (start !== oldStart || end !== oldEnd) newState.due = { start, end };
     newState.hash = { problemsMd5, noticesMd5 };
