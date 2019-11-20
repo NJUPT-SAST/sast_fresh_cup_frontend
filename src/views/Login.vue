@@ -18,7 +18,7 @@
             <v-card-text>
               <v-form>
                 <v-text-field
-                  label="用户名/邮箱"
+                  label="ATSAST账号,如:B19XXXXXX@njupt.edu.cn"
                   :clearable="true"
                   v-model="studentID"
                   name="login"
