@@ -29,7 +29,7 @@
                 <v-text-field
                   id="password"
                   v-model="password"
-                  label="密码"
+                  label="ATSAST密码"
                   name="password"
                   prepend-icon="lock"
                   type="password"
