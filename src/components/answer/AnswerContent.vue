@@ -83,7 +83,7 @@
 <script>
 import marked from 'marked';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css';
+import 'highlight.js/styles/default.css';
 import { baseURL } from '@/api/index.js';
 import AnswerDialog from '@/components/answer/AnswerDialog';
 
@@ -192,4 +192,19 @@ export default {
   .answer-content-card-action
     display flex
     justify-content flex-start
+table
+  border-collapse: collapse
+  margin: 0 auto
+  text-align: center
+  td,th
+    border: 1px solid #cad9ea
+    color: #666
+    height: 30px
+  thead,th
+    background-color: #CCE8EB
+    width: 100px
+  tr:nth-child(odd)
+    background: #fff
+  tr:nth-child(even)
+    background: #F5FAFA
 </style>
