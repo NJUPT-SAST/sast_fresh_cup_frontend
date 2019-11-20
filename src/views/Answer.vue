@@ -20,7 +20,7 @@
         :isDownDisabled="selectedIndex === questionList.length-1"
         @handleUp="handleQuestionSwitch(true)"
         @handleDown="handleQuestionSwitch(false)"
-        @handleDone="showDone = true"
+        @handleDone="showDoneDialog = true"
       />
       <answer-content
         :questionList="questionList"
@@ -28,9 +28,14 @@
         :handleTyping="handleTyping"
        />
     </div>
-    <hand-in-dialog
-      :showDone="showDone"
-      @handleClose="showDone = false"
+    <answer-dialog
+      :hidden="!showDoneDialog"
+      title="确认提交"
+      content="是否确认要交卷？"
+      confirm="确认交卷"
+      deny="取消"
+      @handleDeny=" showDoneDialog = false"
+      @handleConfirm="handleSubmitConfirm"
     />
   </div>
   <loading v-else />
@@ -39,7 +44,7 @@
 <script>
 import SideBarItem from '@/components/answer/SideBarItem';
 import FabGroup from '@/components/answer/fab/FabGroup';
-import HandInDialog from '@/components/answer/HandInDialog';
+import AnswerDialog from '@/components/answer/AnswerDialog';
 import Loading from '@/components/common/Loading';
 import AnswerContent from '@/components/answer/AnswerContent';
 import DebounceConstructor from '@/utils/debounce.js';
@@ -51,7 +56,7 @@ export default {
     SideBarItem,
     FabGroup,
     Loading,
-    HandInDialog,
+    AnswerDialog,
     AnswerContent,
   },
   methods: {
@@ -62,6 +67,10 @@ export default {
       } else {
         this.selectedIndex++;
       }
+    },
+    handleSubmitConfirm() {
+      localStorage.removeItem('fresh_cup_token');
+      this.$router.push({ name: 'homepage' });
     },
   },
   computed: {
@@ -80,7 +89,7 @@ export default {
       handleTyping,
       handleExecute,
       selectedIndex: 0,
-      showDone: false,
+      showDoneDialog: false,
     };
   },
   async mounted() {

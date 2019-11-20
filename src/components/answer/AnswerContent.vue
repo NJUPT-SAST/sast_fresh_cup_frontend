@@ -65,10 +65,19 @@
         <v-btn
           color="grey"
           style="margin-right:40px;color:white"
-          @click.stop="handleValueChange('')"
+          @click.stop="showResetDialog = true"
         >重置</v-btn>
       </v-card-actions>
     </v-card>
+    <answer-dialog
+      :hidden="!showResetDialog"
+      title="确认重置"
+      content="是否重置要交卷？"
+      confirm="确认重置"
+      deny="取消"
+      @handleDeny=" showResetDialog = false"
+      @handleConfirm="handleReset"
+    />
   </div>
 </template>
 <script>
@@ -76,10 +85,13 @@ import marked from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import { baseURL } from '@/api/index.js';
-
+import AnswerDialog from '@/components/answer/AnswerDialog';
 
 export default {
   name: 'AnswerContent',
+  components: {
+    AnswerDialog,
+  },
   props: {
     questionList: {
       type: Array,
@@ -114,11 +126,16 @@ export default {
       });
       this.handleTyping(e, this.selectedIndex);
     },
+    handleReset() {
+      this.handleValueChange('');
+      this.showResetDialog = false;
+    },
     marked,
   },
   data() {
     return {
       baseURL,
+      showResetDialog: false,
     };
   },
   watch: {
