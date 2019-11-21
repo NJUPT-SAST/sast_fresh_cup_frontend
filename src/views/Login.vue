@@ -29,7 +29,7 @@
                 <v-text-field
                   id="password"
                   v-model="password"
-                  label="ATSAST密码"
+                  label="密码,默认学号如:B19xxxxxx"
                   name="password"
                   prepend-icon="lock"
                   type="password"
