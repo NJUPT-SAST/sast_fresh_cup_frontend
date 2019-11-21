@@ -72,7 +72,7 @@
     <answer-dialog
       :hidden="!showResetDialog"
       title="确认重置"
-      content="是否重置要交卷？"
+      content="是否要重置？"
       confirm="确认重置"
       deny="取消"
       @handleDeny=" showResetDialog = false"
