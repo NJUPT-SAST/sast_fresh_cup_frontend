@@ -173,6 +173,9 @@ export default {
 };
 </script>
 <style lang="stylus">
+code:before
+  display none
+
 .answer-content-card
   margin-top 1rem
   padding 1rem
