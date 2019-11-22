@@ -45,6 +45,8 @@ import EditTopic from '@/components/admin/EditTopic';
 import Loading from '@/components/common/Loading';
 import LoadError from '@/components/common/LoadError';
 import AdminWelcome from '@/components/admin/AdminWelcome';
+import { deleteQuestions, deleteNotice } from '@/api/index.js';
+
 
 export default {
   components: {
@@ -89,6 +91,32 @@ export default {
     },
   },
   async mounted() {
+    const store = this.$store;
+    async function deleteWarpper(confirmText, rightAnswer, targets, action) {
+      const answer = prompt(confirmText, 'no');
+      if (answer === rightAnswer) {
+        console.log('删除中...');
+        try {
+          await Promise.all(targets.map(x => action(x)));
+          console.log('删除完成');
+        } catch (e) {
+          console.log(e);
+          console.log('遇到了点错误');
+        }
+      } else {
+        alert('拒绝');
+      }
+    }
+    window.hiddenAction = {
+      async deleteAllQuestion() {
+        const ids = store.state.questionArray.map(x => x.id);
+        deleteWarpper('确认删除所有问题吗?确认请输入yes', 'yes', ids, deleteQuestions);
+      },
+      async deleteAllNotice() {
+        const ids = store.state.noticeArray.map(x => x.id);
+        deleteWarpper('确认删除所有公告吗?确认请输入yes', 'yes', ids, deleteNotice);
+      },
+    };
     if (this.$store.state.userinfo.isAdmin) {
       this.isIniting = true;
       await this.$store

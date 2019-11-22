@@ -64,9 +64,14 @@
       <v-card-actions class="answer-content-card-action">
         <v-btn
           color="grey"
-          style="margin-right:40px;color:white"
+          style="margin-right:20px;color:white"
           @click.stop="showResetDialog = true"
         >重置</v-btn>
+        <v-btn
+          color="grey"
+          :disabled="true"
+          style="margin-right:40px;color:white"
+        >答案已自动保存</v-btn>
       </v-card-actions>
     </v-card>
     <answer-dialog
