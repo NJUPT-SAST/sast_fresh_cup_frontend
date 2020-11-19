@@ -2,7 +2,7 @@
   <v-footer v-if="visible">
     <v-flex text-center>
       <P class="footer-text">
-        2019 —
+        2020 —
         <strong>@SAST</strong>
       </P>
     </v-flex>

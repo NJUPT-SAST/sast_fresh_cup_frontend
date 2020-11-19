@@ -56,15 +56,28 @@ export default {
   components: {
     Timer,
   },
+  data() {
+    return {
+      total: 0,
+      rest: 0,
+    };
+  },
   computed: {
-    total() {
+    // total() {
+    //   const { start, end } = this.$store.state.due;
+    //   return parseInt((end - start) / 60);
+    // },
+    // rest() {
+    //   const { end } = this.$store.state.due;
+    //   return Math.max(parseInt((end - Date.now() / 1000) / 60), 0);
+    // },
+  },
+  mounted() {
+    setInterval(() => {
       const { start, end } = this.$store.state.due;
-      return parseInt((end - start) / 60);
-    },
-    rest() {
-      const { end } = this.$store.state.due;
-      return Math.max(parseInt((end - Date.now() / 1000) / 60), 0);
-    },
+      this.total = parseInt((end - start) / 60);
+      this.rest = Math.max(parseInt((end - Date.now() / 1000) / 60), 0);
+    }, 1000);
   },
   props: {
     isUpDisabled: {

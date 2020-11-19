@@ -18,7 +18,7 @@
             <v-card-text>
               <v-form>
                 <v-text-field
-                  label="ATSAST账号,如:B19XXXXXX@njupt.edu.cn"
+                  label="账号,如:B20XXXXXX"
                   :clearable="true"
                   v-model="studentID"
                   name="login"
@@ -29,7 +29,7 @@
                 <v-text-field
                   id="password"
                   v-model="password"
-                  label="密码,默认学号如:B19xxxxxx"
+                  label="密码,默认学号如:B20xxxxxx"
                   name="password"
                   prepend-icon="lock"
                   type="password"

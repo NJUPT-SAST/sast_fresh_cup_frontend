@@ -14,7 +14,7 @@ export default {
   name: 'Timer',
   computed: {
     percentage() {
-      return this.rest / this.total;
+      return this.rest / Math.max(this.total, 0.00000001);
     },
     color() {
       if (this.percentage < 0.3) return '#F44336';
