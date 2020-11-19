@@ -1,7 +1,7 @@
 <template>
   <div class="homepage-container">
     <v-card width="500" class="mx-auto">
-      <v-card-title class="card_title">致2019年新生：</v-card-title>
+      <v-card-title class="card_title">致2020年新生：</v-card-title>
       <v-card-text>欢迎参加南京邮电大学校科协新柚杯
         <br>点击确定报名参加本次比赛
       </v-card-text>
