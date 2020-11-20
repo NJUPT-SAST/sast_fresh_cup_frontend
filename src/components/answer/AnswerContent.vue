@@ -52,7 +52,7 @@
         v-else
         :mandatory="false"
         @change="handleValueChange"
-        :value="questionList[selectedIndex].answer.content"
+        :value="radioValue"
       >
         <v-radio
           v-for="(option,index) in questionList[selectedIndex].options"
@@ -141,6 +141,7 @@ export default {
     return {
       baseURL,
       showResetDialog: false,
+      radioValue:""
     };
   },
   watch: {
@@ -153,6 +154,9 @@ export default {
         });
       }
     },
+  },
+  updated(){
+    this.radioValue = this.questionList[this.selectedIndex].answer.content;
   },
   mounted() {
     marked.setOptions({
